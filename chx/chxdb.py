@@ -56,7 +56,6 @@ def get_and_plot(scan_id):
     plot_scan(g, e)
 
 
-'''
 if __name__ == '__main__':
     # scan_id = -1
     # scan_id = '31a8fc'
@@ -65,4 +64,3 @@ if __name__ == '__main__':
 
     g, e = get_scan(scan_id)
     plot_scan(g, e)
-'''
