@@ -234,9 +234,12 @@ if __name__ == '__main__':
 
         # Diff pinhole and dark field:
         mean_diff_pinhole = mean_pinhole - mean_dark_field
+        log_mean_diff_pinhole = np.log10(mean_diff_pinhole)
+        neg_idx = np.where(log_mean_diff_pinhole <= 0)
+        log_mean_diff_pinhole[neg_idx] = 0.0
         print('Min: {}  Max: {}\n'.format(mean_diff_pinhole.min(), mean_diff_pinhole.max()))
-        plt.imshow(mean_diff_pinhole, clim=clim)
-        plt.savefig('mean_pinhole_minus_mean_dark_field.png')
+        plt.imshow(log_mean_diff_pinhole, clim=clim)
+        plt.savefig('mean_pinhole_minus_mean_dark_field_log.png')
         _clear_plt()
 
     print('Done')
