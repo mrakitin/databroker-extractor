@@ -1,5 +1,5 @@
 import datetime
-from collections import OrderedDict
+
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
 
