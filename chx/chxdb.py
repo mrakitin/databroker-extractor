@@ -116,6 +116,7 @@ if __name__ == '__main__':
     pinhole_scan = True
 
     clim = (0, 255)
+    enable_log_correction = False
 
     if harmonics_scan:
         # Harmonics scan:
@@ -225,19 +226,25 @@ if __name__ == '__main__':
         scan_pinhole, t_pinhole = get_scan(scan_id_pinhole)
         images_pinhole = get_images(scan_pinhole, 'xray_eye3_image')
         mean_pinhole = np.mean(images_pinhole[0], axis=0)
+        log_mean_pinhole = np.log10(mean_pinhole)
+        if enable_log_correction:
+            neg_idx = np.where(log_mean_pinhole <= 0)
+            log_mean_pinhole[neg_idx] = 0.0
         print('     ID: {}  Number of images: {}'.format(scan_id_pinhole, len(images_pinhole[0])))
         print('     Min: {}  Max: {}\n'.format(mean_pinhole.min(), mean_pinhole.max()))
 
-        plt.imshow(mean_pinhole, clim=clim)
+        # plt.imshow(mean_pinhole, clim=clim)
+        plt.imshow(log_mean_pinhole)
         plt.savefig('mean_pinhole_{}.png'.format(scan_id_pinhole))
         _clear_plt()
 
         # Diff pinhole and dark field:
         mean_diff_pinhole = mean_pinhole - mean_dark_field
         log_mean_diff_pinhole = np.log10(mean_diff_pinhole)
-        neg_idx = np.where(log_mean_diff_pinhole <= 0)
-        log_mean_diff_pinhole[neg_idx] = 0.0
-        print('Min: {}  Max: {}\n'.format(mean_diff_pinhole.min(), mean_diff_pinhole.max()))
+        if enable_log_correction:
+            neg_idx = np.where(log_mean_diff_pinhole <= 0)
+            log_mean_diff_pinhole[neg_idx] = 0.0
+        print('Min: {}  Max: {}\n'.format(log_mean_diff_pinhole.min(), log_mean_diff_pinhole.max()))
         # plt.imshow(mean_diff_pinhole, clim=clim)
         plt.imshow(log_mean_diff_pinhole)
         plt.savefig('mean_pinhole_minus_mean_dark_field_log.png')
