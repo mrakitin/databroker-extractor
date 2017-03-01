@@ -249,6 +249,14 @@ if __name__ == '__main__':
         scan_pinhole, t_pinhole = get_scan(scan_id_pinhole)
         images_pinhole = get_images(scan_pinhole, 'xray_eye3_image')
         mean_pinhole = np.mean(images_pinhole[0], axis=0)
+
+        if left_mean > right_mean:
+            mean_pinhole[:, mean_pinhole.shape[1] / 2:] = mean_pinhole[:,
+                                                          mean_pinhole.shape[1] / 2:] * left_mean / right_mean
+        else:
+            mean_pinhole[:, :mean_pinhole.shape[1] / 2] = mean_pinhole[:,
+                                                          :mean_pinhole.shape[1] / 2] * right_mean / left_mean
+
         log_mean_pinhole = np.log10(mean_pinhole)
         if enable_log_correction:
             neg_idx = np.where(log_mean_pinhole <= 0)
