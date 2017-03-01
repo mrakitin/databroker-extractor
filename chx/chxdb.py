@@ -79,6 +79,12 @@ def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
             plt.savefig('scan_{}.png'.format(scan_id))
 
 
+def _clear_plt():
+    plt.cla()
+    plt.clf()
+    plt.close()
+
+
 if __name__ == '__main__':
     # This may be used if the configuration is not set via ~/.config. See the following documentation for more details:
     # http://nsls-ii.github.io/databroker/configuration.html
@@ -106,7 +112,10 @@ if __name__ == '__main__':
     # detector = 'xray_eye3_image'
 
     harmonics_scan = False
-    intensity_scan = True
+    intensity_scan = False
+    pinhole_scan = True
+
+    clim = (0, 255)
 
     if harmonics_scan:
         # Harmonics scan:
@@ -148,7 +157,86 @@ if __name__ == '__main__':
             get_and_plot(scan_id[0], save=save, gap_field=scan_id[1], idx=i)
 
     if intensity_scan:
-        scan_id = '58732824'
-        scan, t = get_scan(scan_id)
-        images = get_images(scan, 'xray_eye3_image')
-        print(images)
+        # Dark field:
+        scan_id_dark_field = '12738c63'
+        scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
+        images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
+        mean_dark_field = np.mean(images_dark_field[0], axis=0)
+        print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
+        print('     Min: {}  Max: {}\n'.format(mean_dark_field.min(), mean_dark_field.max()))
+
+        plt.imshow(mean_dark_field, clim=clim)
+        plt.savefig('mean_dark_field_{}.png'.format(scan_id_dark_field))
+        _clear_plt()
+
+        # Fiber in:
+        scan_id_fiber_in = '58732824'
+        scan_fiber_in, t_fiber_in = get_scan(scan_id_fiber_in)
+        images_fiber_in = get_images(scan_fiber_in, 'xray_eye3_image')
+        mean_fiber_in = np.mean(images_fiber_in[0], axis=0)
+        print('     ID: {}  Number of images: {}'.format(scan_id_fiber_in, len(images_fiber_in[0])))
+        print('     Min: {}  Max: {}\n'.format(mean_fiber_in.min(), mean_fiber_in.max()))
+
+        plt.imshow(mean_fiber_in, clim=clim)
+        plt.savefig('mean_fiber_in_{}.png'.format(scan_id_fiber_in))
+        _clear_plt()
+
+        # Fiber out:
+        scan_id_fiber_out = '190ae619'
+        scan_fiber_out, t_fiber_out = get_scan(scan_id_fiber_out)
+        images_fiber_out = get_images(scan_fiber_out, 'xray_eye3_image')
+        mean_fiber_out = np.mean(images_fiber_out[0], axis=0)
+        print('     ID: {}  Number of images: {}'.format(scan_id_fiber_out, len(images_fiber_out[0])))
+        print('     Min: {}  Max: {}\n'.format(mean_fiber_out.min(), mean_fiber_out.max()))
+
+        plt.imshow(mean_fiber_out, clim=clim)
+        plt.savefig('mean_fiber_out_{}.png'.format(scan_id_fiber_out))
+        _clear_plt()
+
+        # Diff fiber in and dark field:
+        mean_diff_fiber_in = mean_fiber_in - mean_dark_field
+        print('Min: {}  Max: {}\n'.format(mean_diff_fiber_in.min(), mean_diff_fiber_in.max()))
+        plt.imshow(mean_diff_fiber_in, clim=clim)
+        plt.savefig('mean_fiber_in_minus_mean_dark_field.png')
+        _clear_plt()
+
+        # Diff fiber in and dark field:
+        mean_diff_fiber_out = mean_fiber_out - mean_dark_field
+        print('Min: {}  Max: {}\n'.format(mean_diff_fiber_out.min(), mean_diff_fiber_out.max()))
+        plt.imshow(mean_diff_fiber_out, clim=clim)
+        plt.savefig('mean_fiber_out_minus_mean_dark_field.png')
+        _clear_plt()
+
+    if pinhole_scan:
+        # Dark field:
+        scan_id_dark_field = 'a9a0687c'
+        scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
+        images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
+        mean_dark_field = np.mean(images_dark_field[0], axis=0)
+        print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
+        print('     Min: {}  Max: {}\n'.format(mean_dark_field.min(), mean_dark_field.max()))
+
+        plt.imshow(mean_dark_field, clim=clim)
+        plt.savefig('mean_pinhole_dark_field_{}.png'.format(scan_id_dark_field))
+        _clear_plt()
+
+        # Pinhole:
+        scan_id_pinhole = 'afe3cf59'
+        scan_pinhole, t_pinhole = get_scan(scan_id_pinhole)
+        images_pinhole = get_images(scan_pinhole, 'xray_eye3_image')
+        mean_pinhole = np.mean(images_pinhole[0], axis=0)
+        print('     ID: {}  Number of images: {}'.format(scan_id_pinhole, len(images_pinhole[0])))
+        print('     Min: {}  Max: {}\n'.format(mean_pinhole.min(), mean_pinhole.max()))
+
+        plt.imshow(mean_pinhole, clim=clim)
+        plt.savefig('mean_pinhole_{}.png'.format(scan_id_pinhole))
+        _clear_plt()
+
+        # Diff pinhole and dark field:
+        mean_diff_pinhole = mean_pinhole - mean_dark_field
+        print('Min: {}  Max: {}\n'.format(mean_diff_pinhole.min(), mean_diff_pinhole.max()))
+        plt.imshow(mean_diff_pinhole, clim=clim)
+        plt.savefig('mean_pinhole_minus_mean_dark_field.png')
+        _clear_plt()
+
+    print('Done')

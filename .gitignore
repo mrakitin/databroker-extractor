@@ -97,5 +97,6 @@ ENV/
 
 .idea/
 chx/scan_*.png
+chx/mean_*.png
 
 
