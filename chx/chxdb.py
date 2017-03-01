@@ -36,7 +36,7 @@ def get_scan(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None,
 
 
 def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
-    fig = plt.figure(figsize=(8, 5))
+    fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111)
     ax.scatter(x, y)
     ax.grid()
