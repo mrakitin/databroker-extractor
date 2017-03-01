@@ -214,6 +214,24 @@ if __name__ == '__main__':
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
         images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
         mean_dark_field = np.mean(images_dark_field[0], axis=0)
+
+        # Left and right parts have different chips, so need to normalize left and right parts:
+        '''
+        np.mean(mean_dark_field[:, :mean_dark_field.shape[1]/2])
+        Out[7]: 2.1016548665364585
+
+        In [8]: np.mean(mean_dark_field[:, mean_dark_field.shape[1]/2:])
+        Out[8]: 2.8157670403773496
+        '''
+        left_mean = np.mean(mean_dark_field[:, :mean_dark_field.shape[1] / 2])
+        right_mean = np.mean(mean_dark_field[:, mean_dark_field.shape[1] / 2:])
+        if left_mean > right_mean:
+            mean_dark_field[:, mean_dark_field.shape[1] / 2:] = mean_dark_field[:,
+                                                                mean_dark_field.shape[1] / 2:] * left_mean / right_mean
+        else:
+            mean_dark_field[:, :mean_dark_field.shape[1] / 2] = mean_dark_field[:,
+                                                                :mean_dark_field.shape[1] / 2] * right_mean / left_mean
+
         log_mean_dark_field = np.log10(mean_dark_field)
         if enable_log_correction:
             neg_idx = np.where(log_mean_dark_field <= 0)
