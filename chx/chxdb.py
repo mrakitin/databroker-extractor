@@ -13,18 +13,12 @@ from uti_math import fwhm
 
 
 def get_and_plot(scan_id, save=False, gap_field='', idx=None):
-    g, e, t = get_scan(scan_id, gap_field=gap_field)
+    g, e, t = get_data(scan_id, gap_field=gap_field)
     plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, gap_field=gap_field, idx=idx)
 
 
-def get_scan(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None, debug=False):
-    scan = db[scan_id]
-    t = datetime.datetime.fromtimestamp(scan['start']['time']).strftime('%Y-%m-%d %H:%M:%S')
-
-    if debug:
-        print(scan)
-    print('Scan ID: {}  Timestamp: {}'.format(scan_id, t))
-
+def get_data(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None, debug=False):
+    scan, t = get_scan(scan_id)
     if det:
         imgs = get_images(scan, det)
         im = imgs[-1]
@@ -41,6 +35,15 @@ def get_scan(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None,
     energies = table[energy_field]
 
     return gaps, energies, t
+
+
+def get_scan(scan_id, debug=False):
+    scan = db[scan_id]
+    t = datetime.datetime.fromtimestamp(scan['start']['time']).strftime('%Y-%m-%d %H:%M:%S')
+    if debug:
+        print(scan)
+    print('Scan ID: {}  Timestamp: {}'.format(scan_id, t))
+    return scan, t
 
 
 def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
@@ -102,39 +105,50 @@ if __name__ == '__main__':
     # scan_id = '31a8fc'
     # detector = 'xray_eye3_image'
 
-    scan_ids = [
-        # center vertical mbs on ID cone:	0.6x1.2 (pbs)		17585 (scan#)		date: 02/28/2017
-        # ID harmonic: 5th	energy: 9.65keV		gap: 6.640
-        # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
-        #     100pC, .1s	.2x.4
-        ('1eff511d', 'ivu_gap'),
-        ('8f6a6004', 'ivu_gap'),
-        ('1f1422b4', 'ivu_gap'),
-        ('7949f1b0', 'dcm_b'),
-        ('daeb15e3', 'dcm_b'),
-        ('6edfa33a', 'dcm_b'),
-        # center vertical mbs on ID cone:	0.6x1.2 (pbs)	.4x.1 (mbs)	 17599 (scan#)
-        # ID harmonic: 7th	energy: 9.75keV		gap: 5.240	can't scan gap at 9.65keV…
-        # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
-        #     100pC, .1s	.2x.4
-        ('74798cb6', 'ivu_gap'),
-        ('dc2b5045', 'ivu_gap'),
-        ('c4f95268', 'ivu_gap'),
-        ('b2365717', 'dcm_b'),
-        ('ac99ddd0', 'dcm_b'),
-        ('b808a890', 'dcm_b'),
-        # center vertical mbs on ID cone:	0.6x1.2 (pbs)	.4x.1 (mbs)	 17610 (scan#)
-        # gap scan: #17613
-        # ID harmonic: 7th	energy: 9.65keV		gap: 5.2017
-        # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
-        #     100pC, .1s	.2x.4
-        ('e23fb7a1', 'dcm_b'),
-        ('afc6da9e', 'dcm_b'),
-        ('e71b8b5f', 'dcm_b'),
-    ]
+    harmonics_scan = False
+    intensity_scan = True
 
-    save = True
-    # save = False
+    if harmonics_scan:
+        # Harmonics scan:
+        scan_ids = [
+            # center vertical mbs on ID cone:	0.6x1.2 (pbs)		17585 (scan#)		date: 02/28/2017
+            # ID harmonic: 5th	energy: 9.65keV		gap: 6.640
+            # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
+            #     100pC, .1s	.2x.4
+            ('1eff511d', 'ivu_gap'),
+            ('8f6a6004', 'ivu_gap'),
+            ('1f1422b4', 'ivu_gap'),
+            ('7949f1b0', 'dcm_b'),
+            ('daeb15e3', 'dcm_b'),
+            ('6edfa33a', 'dcm_b'),
+            # center vertical mbs on ID cone:	0.6x1.2 (pbs)	.4x.1 (mbs)	 17599 (scan#)
+            # ID harmonic: 7th	energy: 9.75keV		gap: 5.240	can't scan gap at 9.65keV…
+            # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
+            #     100pC, .1s	.2x.4
+            ('74798cb6', 'ivu_gap'),
+            ('dc2b5045', 'ivu_gap'),
+            ('c4f95268', 'ivu_gap'),
+            ('b2365717', 'dcm_b'),
+            ('ac99ddd0', 'dcm_b'),
+            ('b808a890', 'dcm_b'),
+            # center vertical mbs on ID cone:	0.6x1.2 (pbs)	.4x.1 (mbs)	 17610 (scan#)
+            # gap scan: #17613
+            # ID harmonic: 7th	energy: 9.65keV		gap: 5.2017
+            # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
+            #     100pC, .1s	.2x.4
+            ('e23fb7a1', 'dcm_b'),
+            ('afc6da9e', 'dcm_b'),
+            ('e71b8b5f', 'dcm_b'),
+        ]
 
-    for i, scan_id in enumerate(scan_ids):
-        get_and_plot(scan_id[0], save=save, gap_field=scan_id[1], idx=i)
+        save = True
+        # save = False
+
+        for i, scan_id in enumerate(scan_ids):
+            get_and_plot(scan_id[0], save=save, gap_field=scan_id[1], idx=i)
+
+    if intensity_scan:
+        scan_id = '58732824'
+        scan, t = get_scan(scan_id)
+        images = get_images(scan, 'xray_eye3_image')
+        print(images)
