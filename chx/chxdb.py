@@ -1,7 +1,15 @@
+"""
+This is a library for experimental data processing from the CHX beamline of NSLS-II. It requires the SRW utils library,
+please download https://github.com/ochubar/SRW/blob/master/env/work/srw_python/uti_math.py#L615 and add it to your
+PYTHONPATH environment variable.
+"""
+
 import datetime
 
+import numpy as np
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
+from uti_math import fwhm
 
 
 def get_and_plot(scan_id, save=False, gap_field='', idx=None):
@@ -36,18 +44,26 @@ def get_scan(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None,
 
 
 def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
-    fig = plt.figure(figsize=(10, 7))
-    ax = fig.add_subplot(111)
-    ax.scatter(x, y)
-    ax.grid()
-    ax.set_title('Scan ID: {}  Timestamp: {}'.format(scan_id, timestamp))
-    xlabel = gap_field.replace('_', ' ')
+    x = np.array(x)
+    y = np.array(y)
     if gap_field == 'ivu_gap':
         units = 'mm'
     elif gap_field == 'dcm_b':
         units = 'deg'
     else:
         raise ValueError('Unknown field: {}'.format(gap_field))
+    try:
+        y_norm = (y - np.min(y)) / (np.max(y) - np.min(y)) - 0.5  # roots are at Y=0
+        fwhm_value = fwhm(x, y_norm)
+    except Exception:
+        fwhm_value = -1
+
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111)
+    ax.scatter(x, y)
+    ax.grid()
+    ax.set_title('Scan ID: {}    Timestamp: {}\nFWHM: {:.5f} {}'.format(scan_id, timestamp, fwhm_value, units))
+    xlabel = gap_field.replace('_', ' ')
 
     ax.set_xlabel('{} [{}]'.format(xlabel, units))
     ax.set_ylabel('Intensity [arb. units]')
