@@ -214,11 +214,16 @@ if __name__ == '__main__':
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
         images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
         mean_dark_field = np.mean(images_dark_field[0], axis=0)
+        log_mean_dark_field = np.log10(mean_dark_field)
+        if enable_log_correction:
+            neg_idx = np.where(log_mean_dark_field <= 0)
+            log_mean_dark_field[neg_idx] = 0.0
         print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
         print('     Min: {}  Max: {}\n'.format(mean_dark_field.min(), mean_dark_field.max()))
 
-        plt.imshow(mean_dark_field, clim=clim)
-        plt.savefig('mean_pinhole_dark_field_{}.png'.format(scan_id_dark_field))
+        # plt.imshow(mean_dark_field, clim=clim)
+        plt.imshow(log_mean_dark_field)
+        plt.savefig('mean_pinhole_dark_field_{}_log.png'.format(scan_id_dark_field))
         _clear_plt()
 
         # Pinhole:
@@ -235,7 +240,7 @@ if __name__ == '__main__':
 
         # plt.imshow(mean_pinhole, clim=clim)
         plt.imshow(log_mean_pinhole)
-        plt.savefig('mean_pinhole_{}.png'.format(scan_id_pinhole))
+        plt.savefig('mean_pinhole_{}_log.png'.format(scan_id_pinhole))
         _clear_plt()
 
         # Diff pinhole and dark field:
