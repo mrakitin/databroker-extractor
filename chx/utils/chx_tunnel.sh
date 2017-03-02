@@ -53,7 +53,7 @@ fi
 tunnel_status=$(check_tunnel)
 echo "tunnel status:" $tunnel_status
 if [ -z "$tunnel_status" ]; then
-    ssh -fN -o ExitOnForwardFailure=yes $SERVER 2>/dev/null
+    ssh -fN -o ExitOnForwardFailure=yes ${SSH_SERVER} 2>/dev/null
     sleep $SLEEP
     echo "tunnel status:" $(check_tunnel)
 fi
