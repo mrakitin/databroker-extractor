@@ -5,6 +5,7 @@ PYTHONPATH environment variable.
 """
 
 import datetime
+import time
 
 import numpy as np
 from databroker import db, get_fields, get_images, get_table
@@ -210,6 +211,8 @@ if __name__ == '__main__':
 
     if pinhole_scan:
         # Dark field:
+        start_time = time.time()
+
         scan_id_dark_field = 'a9a0687c'
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
         images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
@@ -223,6 +226,8 @@ if __name__ == '__main__':
         In [8]: np.mean(mean_dark_field[:, mean_dark_field.shape[1]/2:])
         Out[8]: 2.8157670403773496
         '''
+
+        '''
         left_mean = np.mean(mean_dark_field[:, :mean_dark_field.shape[1] / 2])
         right_mean = np.mean(mean_dark_field[:, mean_dark_field.shape[1] / 2:])
         if left_mean > right_mean:
@@ -231,54 +236,82 @@ if __name__ == '__main__':
         else:
             mean_dark_field[:, :mean_dark_field.shape[1] / 2] = mean_dark_field[:,
                                                                 :mean_dark_field.shape[1] / 2] * right_mean / left_mean
-
+        '''
         log_mean_dark_field = np.log10(mean_dark_field)
         if enable_log_correction:
             neg_idx = np.where(log_mean_dark_field <= 0)
             log_mean_dark_field[neg_idx] = 0.0
         print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
-        print('     Min: {}  Max: {}\n'.format(mean_dark_field.min(), mean_dark_field.max()))
+        print('     Min: {}  Max: {}'.format(mean_dark_field.min(), mean_dark_field.max()))
+
+        plt.imshow(mean_dark_field, clim=clim)
+        # plt.imshow(log_mean_dark_field)
+        plt.savefig('mean_pinhole_dark_field_{}.png'.format(scan_id_dark_field))
+        _clear_plt()
 
         # plt.imshow(mean_dark_field, clim=clim)
         plt.imshow(log_mean_dark_field)
         plt.savefig('mean_pinhole_dark_field_{}_log.png'.format(scan_id_dark_field))
         _clear_plt()
 
+        print('Duration: {:.3f} sec\n'.format(time.time() - start_time))
+
         # Pinhole:
+        start_time = time.time()
+
         scan_id_pinhole = 'afe3cf59'
         scan_pinhole, t_pinhole = get_scan(scan_id_pinhole)
         images_pinhole = get_images(scan_pinhole, 'xray_eye3_image')
         mean_pinhole = np.mean(images_pinhole[0], axis=0)
+        mean_pinhole_orig = np.copy(mean_pinhole)
+        mean_pinhole /= mean_dark_field
 
+        '''
         if left_mean > right_mean:
             mean_pinhole[:, mean_pinhole.shape[1] / 2:] = mean_pinhole[:,
                                                           mean_pinhole.shape[1] / 2:] * left_mean / right_mean
         else:
             mean_pinhole[:, :mean_pinhole.shape[1] / 2] = mean_pinhole[:,
                                                           :mean_pinhole.shape[1] / 2] * right_mean / left_mean
-
+        '''
         log_mean_pinhole = np.log10(mean_pinhole)
         if enable_log_correction:
             neg_idx = np.where(log_mean_pinhole <= 0)
             log_mean_pinhole[neg_idx] = 0.0
         print('     ID: {}  Number of images: {}'.format(scan_id_pinhole, len(images_pinhole[0])))
-        print('     Min: {}  Max: {}\n'.format(mean_pinhole.min(), mean_pinhole.max()))
+        print('     Min: {}  Max: {}'.format(mean_pinhole.min(), mean_pinhole.max()))
+
+        plt.imshow(mean_pinhole, clim=clim)
+        # plt.imshow(log_mean_pinhole)
+        plt.savefig('mean_pinhole_{}.png'.format(scan_id_pinhole))
+        _clear_plt()
 
         # plt.imshow(mean_pinhole, clim=clim)
         plt.imshow(log_mean_pinhole)
         plt.savefig('mean_pinhole_{}_log.png'.format(scan_id_pinhole))
         _clear_plt()
 
-        # Diff pinhole and dark field:
-        mean_diff_pinhole = mean_pinhole - mean_dark_field
-        log_mean_diff_pinhole = np.log10(mean_diff_pinhole)
-        if enable_log_correction:
-            neg_idx = np.where(log_mean_diff_pinhole <= 0)
-            log_mean_diff_pinhole[neg_idx] = 0.0
-        print('Min: {}  Max: {}\n'.format(log_mean_diff_pinhole.min(), log_mean_diff_pinhole.max()))
-        # plt.imshow(mean_diff_pinhole, clim=clim)
-        plt.imshow(log_mean_diff_pinhole)
-        plt.savefig('mean_pinhole_minus_mean_dark_field_log.png')
+        plt.imshow(mean_pinhole_orig, clim=clim)
+        plt.savefig('mean_pinhole_{}_orig.png'.format(scan_id_pinhole))
         _clear_plt()
+
+        plt.imshow(np.log10(mean_pinhole_orig))
+        plt.savefig('mean_pinhole_{}_orig_log.png'.format(scan_id_pinhole))
+        _clear_plt()
+
+        print('Duration: {:.3f} sec\n'.format(time.time() - start_time))
+
+        # # Diff pinhole and dark field:
+        # # mean_diff_pinhole = mean_pinhole - mean_dark_field
+        # mean_diff_pinhole = mean_pinhole
+        # log_mean_diff_pinhole = np.log10(mean_diff_pinhole)
+        # if enable_log_correction:
+        #     neg_idx = np.where(log_mean_diff_pinhole <= 0)
+        #     log_mean_diff_pinhole[neg_idx] = 0.0
+        # print('Min: {}  Max: {}\n'.format(log_mean_diff_pinhole.min(), log_mean_diff_pinhole.max()))
+        # # plt.imshow(mean_diff_pinhole, clim=clim)
+        # plt.imshow(log_mean_diff_pinhole)
+        # plt.savefig('mean_pinhole_minus_mean_dark_field_log.png')
+        # _clear_plt()
 
     print('Done')
