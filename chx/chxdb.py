@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is a library for experimental data processing from the CHX beamline of NSLS-II. It requires the SRW utils library,
 please download https://github.com/ochubar/SRW/blob/master/env/work/srw_python/uti_math.py#L615 and add it to your
@@ -110,7 +111,7 @@ if __name__ == '__main__':
 
     # scan_id = -1
     # scan_id = '31a8fc'
-    # detector = 'xray_eye3_image'
+    detector = 'xray_eye3_image'
 
     harmonics_scan = False
     intensity_scan = False
@@ -122,31 +123,31 @@ if __name__ == '__main__':
     if harmonics_scan:
         # Harmonics scan:
         scan_ids = [
-            # center vertical mbs on ID cone:	0.6x1.2 (pbs)		17585 (scan#)		date: 02/28/2017
-            # ID harmonic: 5th	energy: 9.65keV		gap: 6.640
-            # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
-            #     100pC, .1s	.2x.4
+            # center vertical mbs on ID cone: 0.6x1.2 (pbs) 17585 (scan#) date: 02/28/2017
+            # ID harmonic: 5th energy: 9.65keV gap: 6.640
+            # Ti foil, elm: 50pC, .1s .05x.05,.1x.4
+            #     100pC, .1s .2x.4
             ('1eff511d', 'ivu_gap'),
             ('8f6a6004', 'ivu_gap'),
             ('1f1422b4', 'ivu_gap'),
             ('7949f1b0', 'dcm_b'),
             ('daeb15e3', 'dcm_b'),
             ('6edfa33a', 'dcm_b'),
-            # center vertical mbs on ID cone:	0.6x1.2 (pbs)	.4x.1 (mbs)	 17599 (scan#)
-            # ID harmonic: 7th	energy: 9.75keV		gap: 5.240	can't scan gap at 9.65keV…
-            # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
-            #     100pC, .1s	.2x.4
+            # center vertical mbs on ID cone: 0.6x1.2 (pbs) .4x.1 (mbs)  17599 (scan#)
+            # ID harmonic: 7th energy: 9.75keV gap: 5.240 can't scan gap at 9.65keV...
+            # Ti foil, elm: 50pC, .1s .05x.05,.1x.4
+            #     100pC, .1s .2x.4
             ('74798cb6', 'ivu_gap'),
             ('dc2b5045', 'ivu_gap'),
             ('c4f95268', 'ivu_gap'),
             ('b2365717', 'dcm_b'),
             ('ac99ddd0', 'dcm_b'),
             ('b808a890', 'dcm_b'),
-            # center vertical mbs on ID cone:	0.6x1.2 (pbs)	.4x.1 (mbs)	 17610 (scan#)
+            # center vertical mbs on ID cone: 0.6x1.2 (pbs) .4x.1 (mbs) 17610 (scan#)
             # gap scan: #17613
-            # ID harmonic: 7th	energy: 9.65keV		gap: 5.2017
-            # Ti foil, elm: 	50pC, .1s	.05x.05,.1x.4
-            #     100pC, .1s	.2x.4
+            # ID harmonic: 7th energy: 9.65keV gap: 5.2017
+            # Ti foil, elm: 50pC, .1s .05x.05,.1x.4
+            #     100pC, .1s .2x.4
             ('e23fb7a1', 'dcm_b'),
             ('afc6da9e', 'dcm_b'),
             ('e71b8b5f', 'dcm_b'),
@@ -162,7 +163,7 @@ if __name__ == '__main__':
         # Dark field:
         scan_id_dark_field = '12738c63'
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
-        images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
+        images_dark_field = get_images(scan_dark_field, detector)
         mean_dark_field = np.mean(images_dark_field[0], axis=0)
         print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
         print('     Min: {}  Max: {}\n'.format(mean_dark_field.min(), mean_dark_field.max()))
@@ -174,7 +175,7 @@ if __name__ == '__main__':
         # Fiber in:
         scan_id_fiber_in = '58732824'
         scan_fiber_in, t_fiber_in = get_scan(scan_id_fiber_in)
-        images_fiber_in = get_images(scan_fiber_in, 'xray_eye3_image')
+        images_fiber_in = get_images(scan_fiber_in, detector)
         mean_fiber_in = np.mean(images_fiber_in[0], axis=0)
         print('     ID: {}  Number of images: {}'.format(scan_id_fiber_in, len(images_fiber_in[0])))
         print('     Min: {}  Max: {}\n'.format(mean_fiber_in.min(), mean_fiber_in.max()))
@@ -186,7 +187,7 @@ if __name__ == '__main__':
         # Fiber out:
         scan_id_fiber_out = '190ae619'
         scan_fiber_out, t_fiber_out = get_scan(scan_id_fiber_out)
-        images_fiber_out = get_images(scan_fiber_out, 'xray_eye3_image')
+        images_fiber_out = get_images(scan_fiber_out, detector)
         mean_fiber_out = np.mean(images_fiber_out[0], axis=0)
         print('     ID: {}  Number of images: {}'.format(scan_id_fiber_out, len(images_fiber_out[0])))
         print('     Min: {}  Max: {}\n'.format(mean_fiber_out.min(), mean_fiber_out.max()))
@@ -215,7 +216,7 @@ if __name__ == '__main__':
 
         scan_id_dark_field = 'a9a0687c'
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
-        images_dark_field = get_images(scan_dark_field, 'xray_eye3_image')
+        images_dark_field = get_images(scan_dark_field, detector)
         mean_dark_field = np.mean(images_dark_field[0], axis=0)
 
         # Left and right parts have different chips, so need to normalize left and right parts:
@@ -261,7 +262,7 @@ if __name__ == '__main__':
 
         scan_id_pinhole = 'afe3cf59'
         scan_pinhole, t_pinhole = get_scan(scan_id_pinhole)
-        images_pinhole = get_images(scan_pinhole, 'xray_eye3_image')
+        images_pinhole = get_images(scan_pinhole, detector)
         mean_pinhole = np.mean(images_pinhole[0], axis=0)
         mean_pinhole_orig = np.copy(mean_pinhole)
         mean_pinhole /= mean_dark_field
