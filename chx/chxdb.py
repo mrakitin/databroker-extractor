@@ -80,6 +80,8 @@ def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
         else:
             plt.savefig('scan_{}.png'.format(scan_id))
 
+def get_scans_list(keyword):
+    return db(keyword)
 
 def _clear_plt():
     plt.cla()
@@ -115,7 +117,9 @@ if __name__ == '__main__':
 
     harmonics_scan = False
     intensity_scan = False
-    pinhole_scan = True
+    pinhole_scan = False
+
+    list_scans = True
 
     clim = (0, 255)
     enable_log_correction = False
@@ -314,5 +318,11 @@ if __name__ == '__main__':
         # plt.imshow(log_mean_diff_pinhole)
         # plt.savefig('mean_pinhole_minus_mean_dark_field_log.png')
         # _clear_plt()
+
+    if list_scans:
+        scans_list = get_scans_list(keyword='Chubar')
+        print('Scans list: {}'.format(len(scans_list)))
+        for s in scans_list:
+            print(s)
 
     print('Done')
