@@ -96,10 +96,12 @@ ENV/
 .ropeproject
 
 .idea/
-chx/scan_*.png
-chx/mean_*.png
+chx/*.png
 chx/images/*.png
+chx/*.dat
 chx/images/*.dat
+
+smi/*.png
+smi/images/*.png
 smi/*.dat
 smi/images/*.dat
-
