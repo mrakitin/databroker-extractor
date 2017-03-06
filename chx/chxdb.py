@@ -208,6 +208,10 @@ if __name__ == '__main__':
             get_and_plot(scan_id[0], save=save, field=scan_id[1], idx=i)
 
     if fiber_scan:
+        first_slice=1000
+        second_slice=1250
+        third_slice=1500
+
         # Dark field:
         scan_id_dark_field = '12738c63'
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
@@ -218,6 +222,24 @@ if __name__ == '__main__':
 
         plt.imshow(mean_dark_field, clim=clim)
         plt.savefig('mean_dark_field_{}.png'.format(scan_id_dark_field))
+        _clear_plt()
+
+        shape = mean_dark_field.shape
+        np.savetxt(
+            'mean_dark_field_slices_{}.dat'.format(scan_id_dark_field),
+            mean_dark_field[:, (first_slice, second_slice, third_slice)],
+            header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
+        )
+        print('=== Shape: {}'.format(shape))
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_xlim((0, shape[0]))
+        ax.grid()
+        ax.plot(mean_dark_field[:, first_slice], label='pixel={}'.format(first_slice))
+        ax.plot(mean_dark_field[:, second_slice], label='pixel={}'.format(second_slice))
+        ax.plot(mean_dark_field[:, third_slice], label='pixel={}'.format(third_slice))
+        ax.legend()
+        fig.savefig('mean_dark_field_slices_{}.png'.format(scan_id_dark_field))
         _clear_plt()
 
         # Fiber in:
@@ -251,11 +273,47 @@ if __name__ == '__main__':
         plt.savefig('mean_fiber_in_minus_mean_dark_field.png')
         _clear_plt()
 
+        shape = mean_diff_fiber_in.shape
+        np.savetxt(
+            'mean_fiber_in_minus_mean_dark_field_slices.dat',
+            mean_dark_field[:, (first_slice, second_slice, third_slice)],
+            header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
+        )
+        print('=== Shape: {}'.format(shape))
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_xlim((0, shape[0]))
+        ax.grid()
+        ax.plot(mean_diff_fiber_in[:, first_slice], label='pixel={}'.format(first_slice))
+        ax.plot(mean_diff_fiber_in[:, second_slice], label='pixel={}'.format(second_slice))
+        ax.plot(mean_diff_fiber_in[:, third_slice], label='pixel={}'.format(third_slice))
+        ax.legend()
+        fig.savefig('mean_fiber_in_minus_mean_dark_field_slices.png')
+        _clear_plt()
+
         # Diff fiber in and dark field:
         mean_diff_fiber_out = mean_fiber_out - mean_dark_field
         print('Min: {}  Max: {}\n'.format(mean_diff_fiber_out.min(), mean_diff_fiber_out.max()))
         plt.imshow(mean_diff_fiber_out, clim=clim)
         plt.savefig('mean_fiber_out_minus_mean_dark_field.png')
+        _clear_plt()
+
+        shape = mean_diff_fiber_out.shape
+        np.savetxt(
+            'mean_fiber_out_minus_mean_dark_field_slices.dat',
+            mean_dark_field[:, (first_slice, second_slice, third_slice)],
+            header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
+        )
+        print('=== Shape: {}'.format(shape))
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_xlim((0, shape[0]))
+        ax.grid()
+        ax.plot(mean_diff_fiber_out[:, first_slice], label='pixel={}'.format(first_slice))
+        ax.plot(mean_diff_fiber_out[:, second_slice], label='pixel={}'.format(second_slice))
+        ax.plot(mean_diff_fiber_out[:, third_slice], label='pixel={}'.format(third_slice))
+        ax.legend()
+        fig.savefig('mean_fiber_out_minus_mean_dark_field_slices.png')
         _clear_plt()
 
         # Fiber in - fiber out:

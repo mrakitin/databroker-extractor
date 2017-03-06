@@ -99,5 +99,7 @@ ENV/
 chx/scan_*.png
 chx/mean_*.png
 chx/images/*.png
-
+chx/images/*.dat
+smi/*.dat
+smi/images/*.dat
 
