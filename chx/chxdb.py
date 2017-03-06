@@ -116,10 +116,9 @@ if __name__ == '__main__':
     detector = 'xray_eye3_image'
 
     harmonics_scan = False
-    intensity_scan = False
+    intensity_scan = True
     pinhole_scan = False
-
-    list_scans = True
+    list_scans = False
 
     clim = (0, 255)
     enable_log_correction = False
@@ -212,6 +211,25 @@ if __name__ == '__main__':
         print('Min: {}  Max: {}\n'.format(mean_diff_fiber_out.min(), mean_diff_fiber_out.max()))
         plt.imshow(mean_diff_fiber_out, clim=clim)
         plt.savefig('mean_fiber_out_minus_mean_dark_field.png')
+        _clear_plt()
+
+        # Fiber in - fiber out:
+        mean_fiber_in_minus_out = mean_diff_fiber_in - mean_diff_fiber_out
+        print('Min: {}  Max: {}\n'.format(mean_fiber_in_minus_out.min(), mean_fiber_in_minus_out.max()))
+        plt.imshow(mean_fiber_in_minus_out, clim=clim)
+        plt.savefig('mean_fiber_in_minus_out.png')
+        _clear_plt()
+
+        # Fiber in / fiber out:
+        where_zero = np.where(mean_diff_fiber_out == 0)
+        mean_diff_fiber_out[where_zero] = 1
+        mean_fiber_in_div_out = mean_diff_fiber_in / mean_diff_fiber_out
+        print('Min: {}  Max: {}\n'.format(mean_fiber_in_div_out.min(), mean_fiber_in_div_out.max()))
+        max_in = mean_diff_fiber_in.max()
+        max_out = mean_diff_fiber_out.max()
+        print('Max in: {}  Max out: {}'.format(max_in, max_out))
+        plt.imshow(mean_fiber_in_div_out, clim= max_in / max_out)
+        plt.savefig('mean_fiber_in_div_out.png')
         _clear_plt()
 
     if pinhole_scan:
