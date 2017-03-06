@@ -14,12 +14,29 @@ from matplotlib import pyplot as plt
 from uti_math import fwhm
 
 
-def get_and_plot(scan_id, save=False, gap_field='', idx=None):
-    g, e, t = get_data(scan_id, gap_field=gap_field)
-    plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, gap_field=gap_field, idx=idx)
+def get_and_plot(scan_id, save=False, field='', idx=None):
+    """Get data from table and plot it (produces Intensity vs. Ugap or mono angle).
+
+    :param scan_id: scan id from bluesky.
+    :param save: an option to save a picture instead of showing it.
+    :param field: visualize the intensity vs. this field.
+    :param idx: index of the image (used as a part of the name in the saving process).
+    :return: None.
+    """
+    g, e, t = get_data(scan_id, field=field)
+    plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, field=field, idx=idx)
 
 
-def get_data(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None, debug=False):
+def get_data(scan_id, field='ivu_gap', intensity_field='elm_sum_all', det=None, debug=False):
+    """Get data from the scan stored in the table.
+
+    :param scan_id: scan id from bluesky.
+    :param field: visualize the intensity vs. this field.
+    :param intensity_field: the name of the intensity field.
+    :param det: the name of the detector.
+    :param debug: a debug flag.
+    :return: a tuple of X, Y and timestamp values.
+    """
     scan, t = get_scan(scan_id)
     if det:
         imgs = get_images(scan, det)
@@ -33,13 +50,19 @@ def get_data(scan_id, gap_field='ivu_gap', energy_field='elm_sum_all', det=None,
     if debug:
         print(table)
         print(fields)
-    gaps = table[gap_field]
-    energies = table[energy_field]
+    x = table[field]
+    y = table[intensity_field]
 
-    return gaps, energies, t
+    return x, y, t
 
 
 def get_scan(scan_id, debug=False):
+    """Get scan from databroker using provided scan id.
+
+    :param scan_id: scan id from bluesky.
+    :param debug: a debug flag.
+    :return: a tuple of scan and timestamp values.
+    """
     scan = db[scan_id]
     t = datetime.datetime.fromtimestamp(scan['start']['time']).strftime('%Y-%m-%d %H:%M:%S')
     if debug:
@@ -48,15 +71,26 @@ def get_scan(scan_id, debug=False):
     return scan, t
 
 
-def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
+def plot_scan(x, y, scan_id, timestamp, save, field, idx):
+    """Plot intensities vs. scan variable.
+
+    :param x: scan variable.
+    :param y: intensity.
+    :param scan_id: scan id from bluesky.
+    :param timestamp: a timestamp of the scan.
+    :param save: a flag to save the produced image.
+    :param field: visualize the intensity vs. this field.
+    :param idx: index of the image (used as a part of the name in the saving process).
+    :return: None.
+    """
     x = np.array(x)
     y = np.array(y)
-    if gap_field == 'ivu_gap':
+    if field == 'ivu_gap':
         units = 'mm'
-    elif gap_field == 'dcm_b':
+    elif field == 'dcm_b':
         units = 'deg'
     else:
-        raise ValueError('Unknown field: {}'.format(gap_field))
+        raise ValueError('Unknown field: {}'.format(field))
     try:
         y_norm = (y - np.min(y)) / (np.max(y) - np.min(y)) - 0.5  # roots are at Y=0
         fwhm_value = fwhm(x, y_norm)
@@ -68,7 +102,7 @@ def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
     ax.scatter(x, y)
     ax.grid()
     ax.set_title('Scan ID: {}    Timestamp: {}\nFWHM: {:.5f} {}'.format(scan_id, timestamp, fwhm_value, units))
-    xlabel = gap_field.replace('_', ' ')
+    xlabel = field.replace('_', ' ')
 
     ax.set_xlabel('{} [{}]'.format(xlabel, units))
     ax.set_ylabel('Intensity [arb. units]')
@@ -80,10 +114,21 @@ def plot_scan(x, y, scan_id, timestamp, save, gap_field, idx):
         else:
             plt.savefig('scan_{}.png'.format(scan_id))
 
+
 def get_scans_list(keyword):
+    """Get a list of scan filtered by the provided keyword.
+
+    :param keyword: a keyword to search scans.
+    :return: a list of found scans.
+    """
     return db(keyword)
 
+
 def _clear_plt():
+    """Clear the plots (useful when plotting in a loop).
+
+    :return: None
+    """
     plt.cla()
     plt.clf()
     plt.close()
@@ -116,7 +161,7 @@ if __name__ == '__main__':
     detector = 'xray_eye3_image'
 
     harmonics_scan = False
-    intensity_scan = True
+    fiber_scan = True
     pinhole_scan = False
     list_scans = False
 
@@ -160,9 +205,9 @@ if __name__ == '__main__':
         # save = False
 
         for i, scan_id in enumerate(scan_ids):
-            get_and_plot(scan_id[0], save=save, gap_field=scan_id[1], idx=i)
+            get_and_plot(scan_id[0], save=save, field=scan_id[1], idx=i)
 
-    if intensity_scan:
+    if fiber_scan:
         # Dark field:
         scan_id_dark_field = '12738c63'
         scan_dark_field, t_dark_field = get_scan(scan_id_dark_field)
@@ -228,7 +273,7 @@ if __name__ == '__main__':
         max_in = mean_diff_fiber_in.max()
         max_out = mean_diff_fiber_out.max()
         print('Max in: {}  Max out: {}'.format(max_in, max_out))
-        plt.imshow(mean_fiber_in_div_out, clim= max_in / max_out)
+        plt.imshow(mean_fiber_in_div_out, clim=max_in / max_out)
         plt.savefig('mean_fiber_in_div_out.png')
         _clear_plt()
 
