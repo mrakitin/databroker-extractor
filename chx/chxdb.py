@@ -227,8 +227,8 @@ if __name__ == '__main__':
         shape = mean_dark_field.shape
         np.savetxt(
             'mean_dark_field_slices_{}.dat'.format(scan_id_dark_field),
-            mean_dark_field[:, (first_slice, second_slice, third_slice)],
-            header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
+            mean_dark_field[:, :],
+            # header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
         )
         print('=== Shape: {}'.format(shape))
         fig = plt.figure()
@@ -276,8 +276,8 @@ if __name__ == '__main__':
         shape = mean_diff_fiber_in.shape
         np.savetxt(
             'mean_fiber_in_minus_mean_dark_field_slices.dat',
-            mean_dark_field[:, (first_slice, second_slice, third_slice)],
-            header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
+            mean_diff_fiber_in[:, :],
+            # header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
         )
         print('=== Shape: {}'.format(shape))
         fig = plt.figure()
@@ -301,8 +301,8 @@ if __name__ == '__main__':
         shape = mean_diff_fiber_out.shape
         np.savetxt(
             'mean_fiber_out_minus_mean_dark_field_slices.dat',
-            mean_dark_field[:, (first_slice, second_slice, third_slice)],
-            header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
+            mean_diff_fiber_out[:, :],
+            # header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
         )
         print('=== Shape: {}'.format(shape))
         fig = plt.figure()
