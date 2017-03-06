@@ -166,6 +166,7 @@ if __name__ == '__main__':
     list_scans = False
 
     clim = (0, 255)
+    cmap = 'jet'
     enable_log_correction = False
 
     if harmonics_scan:
@@ -220,7 +221,7 @@ if __name__ == '__main__':
         print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
         print('     Min: {}  Max: {}\n'.format(mean_dark_field.min(), mean_dark_field.max()))
 
-        plt.imshow(mean_dark_field, clim=clim)
+        plt.imshow(mean_dark_field, clim=clim, cmap=cmap)
         plt.savefig('mean_dark_field_{}.png'.format(scan_id_dark_field))
         _clear_plt()
 
@@ -250,7 +251,7 @@ if __name__ == '__main__':
         print('     ID: {}  Number of images: {}'.format(scan_id_fiber_in, len(images_fiber_in[0])))
         print('     Min: {}  Max: {}\n'.format(mean_fiber_in.min(), mean_fiber_in.max()))
 
-        plt.imshow(mean_fiber_in, clim=clim)
+        plt.imshow(mean_fiber_in, clim=clim, cmap=cmap)
         plt.savefig('mean_fiber_in_{}.png'.format(scan_id_fiber_in))
         _clear_plt()
 
@@ -262,14 +263,14 @@ if __name__ == '__main__':
         print('     ID: {}  Number of images: {}'.format(scan_id_fiber_out, len(images_fiber_out[0])))
         print('     Min: {}  Max: {}\n'.format(mean_fiber_out.min(), mean_fiber_out.max()))
 
-        plt.imshow(mean_fiber_out, clim=clim)
+        plt.imshow(mean_fiber_out, clim=clim, cmap=cmap)
         plt.savefig('mean_fiber_out_{}.png'.format(scan_id_fiber_out))
         _clear_plt()
 
         # Diff fiber in and dark field:
         mean_diff_fiber_in = mean_fiber_in - mean_dark_field
         print('Min: {}  Max: {}\n'.format(mean_diff_fiber_in.min(), mean_diff_fiber_in.max()))
-        plt.imshow(mean_diff_fiber_in, clim=clim)
+        plt.imshow(mean_diff_fiber_in, clim=clim, cmap=cmap)
         plt.savefig('mean_fiber_in_minus_mean_dark_field.png')
         _clear_plt()
 
@@ -294,7 +295,7 @@ if __name__ == '__main__':
         # Diff fiber in and dark field:
         mean_diff_fiber_out = mean_fiber_out - mean_dark_field
         print('Min: {}  Max: {}\n'.format(mean_diff_fiber_out.min(), mean_diff_fiber_out.max()))
-        plt.imshow(mean_diff_fiber_out, clim=clim)
+        plt.imshow(mean_diff_fiber_out, clim=clim, cmap=cmap)
         plt.savefig('mean_fiber_out_minus_mean_dark_field.png')
         _clear_plt()
 
@@ -319,7 +320,7 @@ if __name__ == '__main__':
         # Fiber in - fiber out:
         mean_fiber_in_minus_out = mean_diff_fiber_in - mean_diff_fiber_out
         print('Min: {}  Max: {}\n'.format(mean_fiber_in_minus_out.min(), mean_fiber_in_minus_out.max()))
-        plt.imshow(mean_fiber_in_minus_out, clim=clim)
+        plt.imshow(mean_fiber_in_minus_out, clim=clim, cmap=cmap)
         plt.savefig('mean_fiber_in_minus_out.png')
         _clear_plt()
 
@@ -331,7 +332,7 @@ if __name__ == '__main__':
         max_in = mean_diff_fiber_in.max()
         max_out = mean_diff_fiber_out.max()
         print('Max in: {}  Max out: {}'.format(max_in, max_out))
-        plt.imshow(mean_fiber_in_div_out, clim=max_in / max_out)
+        plt.imshow(mean_fiber_in_div_out, clim=max_in / max_out, cmap=cmap)
         plt.savefig('mean_fiber_in_div_out.png')
         _clear_plt()
 
@@ -370,13 +371,13 @@ if __name__ == '__main__':
         print('     ID: {}  Number of images: {}'.format(scan_id_dark_field, len(images_dark_field[0])))
         print('     Min: {}  Max: {}'.format(mean_dark_field.min(), mean_dark_field.max()))
 
-        plt.imshow(mean_dark_field, clim=clim)
-        # plt.imshow(log_mean_dark_field)
+        plt.imshow(mean_dark_field, clim=clim, cmap=cmap)
+        # plt.imshow(log_mean_dark_field, cmap=cmap)
         plt.savefig('mean_pinhole_dark_field_{}.png'.format(scan_id_dark_field))
         _clear_plt()
 
-        # plt.imshow(mean_dark_field, clim=clim)
-        plt.imshow(log_mean_dark_field)
+        # plt.imshow(mean_dark_field, clim=clim, cmap=cmap)
+        plt.imshow(log_mean_dark_field, cmap=cmap)
         plt.savefig('mean_pinhole_dark_field_{}_log.png'.format(scan_id_dark_field))
         _clear_plt()
 
@@ -407,21 +408,21 @@ if __name__ == '__main__':
         print('     ID: {}  Number of images: {}'.format(scan_id_pinhole, len(images_pinhole[0])))
         print('     Min: {}  Max: {}'.format(mean_pinhole.min(), mean_pinhole.max()))
 
-        plt.imshow(mean_pinhole, clim=clim)
-        # plt.imshow(log_mean_pinhole)
+        plt.imshow(mean_pinhole, clim=clim, cmap=cmap)
+        # plt.imshow(log_mean_pinhole, cmap=cmap)
         plt.savefig('mean_pinhole_{}.png'.format(scan_id_pinhole))
         _clear_plt()
 
-        # plt.imshow(mean_pinhole, clim=clim)
-        plt.imshow(log_mean_pinhole)
+        # plt.imshow(mean_pinhole, clim=clim, cmap=cmap)
+        plt.imshow(log_mean_pinhole, cmap=cmap)
         plt.savefig('mean_pinhole_{}_log.png'.format(scan_id_pinhole))
         _clear_plt()
 
-        plt.imshow(mean_pinhole_orig, clim=clim)
+        plt.imshow(mean_pinhole_orig, clim=clim, cmap=cmap)
         plt.savefig('mean_pinhole_{}_orig.png'.format(scan_id_pinhole))
         _clear_plt()
 
-        plt.imshow(np.log10(mean_pinhole_orig))
+        plt.imshow(np.log10(mean_pinhole_orig), cmap=cmap)
         plt.savefig('mean_pinhole_{}_orig_log.png'.format(scan_id_pinhole))
         _clear_plt()
 
@@ -435,8 +436,8 @@ if __name__ == '__main__':
         #     neg_idx = np.where(log_mean_diff_pinhole <= 0)
         #     log_mean_diff_pinhole[neg_idx] = 0.0
         # print('Min: {}  Max: {}\n'.format(log_mean_diff_pinhole.min(), log_mean_diff_pinhole.max()))
-        # # plt.imshow(mean_diff_pinhole, clim=clim)
-        # plt.imshow(log_mean_diff_pinhole)
+        # # plt.imshow(mean_diff_pinhole, clim=clim, cmap=cmap)
+        # plt.imshow(log_mean_diff_pinhole, cmap=cmap)
         # plt.savefig('mean_pinhole_minus_mean_dark_field_log.png')
         # _clear_plt()
 
