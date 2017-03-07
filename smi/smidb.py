@@ -9,33 +9,46 @@ from uti_math import fwhm
 if __name__ == '__main__':
     timestamp = datetime.datetime.fromtimestamp(time.time() - 5 * 3600).strftime('%Y-%m-%d_%H_%M_%S')
 
-    last_scan = db[-1]
-    # last_scan = db[238]
-    print(last_scan)
-
-    # Get data:
-    data = get_table(last_scan)
-    print(data)
-
-    # Get fields:
-    fields = list(get_fields(last_scan))
-    print(fields)
-
-    # Plot:
+    # scan_ids = [243, 255]
+    scan_ids = [255, 243]
+    scans = []
+    data_list = []
+    fwhm_values = []
     x_label = 'bragg'
     y_label = 'VFMcamroi1'
-    x = np.array(data[x_label])
-    y = np.array(data[y_label])
-    plt.plot(x, y)
-    y_norm = (y - np.min(y)) / (np.max(y) - np.min(y)) - 0.5  # roots are at Y=0
-    fwhm_value = fwhm(x, y_norm)
-    print('FWHM: {}'.format(fwhm_value))
+    for scan_id in scan_ids:
+        scan = db[scan_id]
+        data = get_table(scan)
+
+        scans.append(scan)
+        data_list.append(data)
+
+        # Get fields:
+        fields = list(get_fields(scan))
+        print('scan_id: {}'.format(scan.start.scan_id))
+
+    # y_max = np.array([x[y_label] for x in data_list]).max()
+    y_max = 1
+    for i, scan_id in enumerate(scan_ids):
+        x = np.array(data_list[i][x_label])
+        y = np.array(data_list[i][y_label])
+
+        y_norm = (y - np.min(y)) / (np.max(y) - np.min(y)) - 0.5  # roots are at Y=0
+        try:
+            fwhm_value = fwhm(x, y_norm)
+        except:
+            fwhm_value = -1
+        fwhm_values.append(fwhm_value)
+
+        # Plot:
+        plt.plot(x, y / y_max, label='scan_id={},\nFWHM={:.5f}'.format(scans[i].start.scan_id, fwhm_value))
+
+    plt.legend()
 
     plt.title(
-        'UID:{}\nscan_id: {}  FWHM: {:.5f}'.format(
-            last_scan.start.uid,
-            last_scan.start.scan_id,
-            fwhm_value,
+        'UID:{}\nscan_id: {}'.format(
+            scans[-1].start.uid,
+            ', '.join([str(x.start.scan_id) for x in scans]),
         )
     )
 
@@ -43,6 +56,6 @@ if __name__ == '__main__':
     plt.ylabel(y_label)
     plt.grid()
 
-    plt.savefig('timestamp_{}_scan_{}.png'.format(timestamp, last_scan.start.scan_id))
+    plt.savefig('timestamp_{}_scan_{}.png'.format(timestamp, scans[-1].start.scan_id))
 
     plt.show()
