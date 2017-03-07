@@ -11,31 +11,6 @@ def normalize(y, shift=0.5):
     return (y - np.min(y)) / (np.max(y) - np.min(y)) - shift  # roots are at Y=0
 
 
-def read_single_scan(scan_id, x_label='bragg', y_label='VFMcamroi1'):
-    scan = db[scan_id]
-    fields = get_fields(scan)
-    data = get_table(scan)
-    x = np.array(data[x_label])
-    y = np.array(data[y_label])
-    try:
-        fwhm = calc_fwhm(x, normalize(y))
-    except:
-        fwhm = -1
-
-    return {
-        'scan': scan,
-        'scan_id': scan.start.scan_id,
-        'uid': scan.start.uid,
-        'fields': fields,
-        'data': data,
-        'x': x,
-        'y': y,
-        'x_label': x_label,
-        'y_label': y_label,
-        'fwhm': fwhm,
-    }
-
-
 def plot_scans(scan_ids, offset_hours=-5, norm=None, x_label='bragg', y_label='VFMcamroi1', show=True):
     timestamp = datetime.datetime.fromtimestamp(time.time() + offset_hours * 3600).strftime('%Y-%m-%d_%H_%M_%S')
     d = read_scans(scan_ids)
@@ -94,6 +69,31 @@ def read_scans(scan_ids, x_label='bragg', y_label='VFMcamroi1'):
     }
 
 
+def read_single_scan(scan_id, x_label='bragg', y_label='VFMcamroi1'):
+    scan = db[scan_id]
+    fields = get_fields(scan)
+    data = get_table(scan)
+    x = np.array(data[x_label])
+    y = np.array(data[y_label])
+    try:
+        fwhm = calc_fwhm(x, normalize(y))
+    except:
+        fwhm = -1
+
+    return {
+        'scan': scan,
+        'scan_id': scan.start.scan_id,
+        'uid': scan.start.uid,
+        'fields': fields,
+        'data': data,
+        'x': x,
+        'y': y,
+        'x_label': x_label,
+        'y_label': y_label,
+        'fwhm': fwhm,
+    }
+
+
 def save_data(scan_id):
     d = read_single_scan(scan_id)
     file_name = 'scan_{}.dat'.format(scan_id)
@@ -115,15 +115,20 @@ def _clear_plt():
 
 
 if __name__ == '__main__':
-    scan_ids = [243, 255]
-    # scan_ids = [-3, -2]
-    # norm = None
-    # norm = 'total'
-    norm = 'individual'
-    # plot_scans(scan_ids=scan_ids, norm=norm)
+    plot_graphs = True
+    save_data_files = False
 
-    scan_ids = range(243, 259 + 1)
-    for scan_id in scan_ids:
-        plot_scans(scan_ids=[scan_id], show=False)
-        file_name = save_data(scan_id)
-        print('Saved {}'.format(file_name))
+    if plot_graphs:
+        scan_ids = range(243, 255)
+        # scan_ids = [-3, -2]
+        norm = None
+        # norm = 'total'
+        # norm = 'individual'
+        plot_scans(scan_ids=scan_ids, norm=norm)
+
+    if save_data_files:
+        scan_ids = range(243, 259 + 1)
+        for scan_id in scan_ids:
+            plot_scans(scan_ids=[scan_id], show=False)
+            file_name = save_data(scan_id)
+            print('Saved {}'.format(file_name))
