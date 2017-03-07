@@ -167,6 +167,7 @@ if __name__ == '__main__':
 
     clim = (0, 255)
     cmap = 'jet'
+    plt.rcParams['image.cmap'] = cmap
     enable_log_correction = False
 
     if harmonics_scan:
