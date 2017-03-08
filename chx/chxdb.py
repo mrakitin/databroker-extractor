@@ -9,6 +9,7 @@ import datetime
 import time
 
 import numpy as np
+from PIL import Image
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
 from uti_math import fwhm
@@ -71,6 +72,15 @@ def get_scan(scan_id, debug=False):
     return scan, t
 
 
+def get_scans_list(keyword):
+    """Get a list of scan filtered by the provided keyword.
+
+    :param keyword: a keyword to search scans.
+    :return: a list of found scans.
+    """
+    return db(keyword)
+
+
 def plot_scan(x, y, scan_id, timestamp, save, field, idx):
     """Plot intensities vs. scan variable.
 
@@ -115,13 +125,20 @@ def plot_scan(x, y, scan_id, timestamp, save, field, idx):
             plt.savefig('scan_{}.png'.format(scan_id))
 
 
-def get_scans_list(keyword):
-    """Get a list of scan filtered by the provided keyword.
+def save_dat_file(data, name, header=None):
+    kwargs = {}
+    if header:
+        kwargs['header'] = header
+    np.savetxt(
+        name,
+        data,
+        **kwargs
+    )
 
-    :param keyword: a keyword to search scans.
-    :return: a list of found scans.
-    """
-    return db(keyword)
+
+def save_raw_image(data, name):
+    im = Image.fromarray(data).convert('L')
+    im.save(name)
 
 
 def _clear_plt():
@@ -210,9 +227,9 @@ if __name__ == '__main__':
             get_and_plot(scan_id[0], save=save, field=scan_id[1], idx=i)
 
     if fiber_scan:
-        first_slice=1000
-        second_slice=1250
-        third_slice=1500
+        first_slice = 1000
+        second_slice = 1250
+        third_slice = 1500
 
         # Dark field:
         scan_id_dark_field = '12738c63'
@@ -227,12 +244,11 @@ if __name__ == '__main__':
         _clear_plt()
 
         shape = mean_dark_field.shape
-        np.savetxt(
-            'mean_dark_field_{}.dat'.format(scan_id_dark_field),
-            mean_dark_field[:, :],
-            # header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
-        )
-        print('=== Shape: {}'.format(shape))
+        print('Shape of mean_dark_field: {}'.format(shape))
+
+        save_dat_file(data=mean_dark_field, name='mean_dark_field_{}.dat'.format(scan_id_dark_field))
+        save_raw_image(data=mean_dark_field, name='mean_dark_field_{}.tif'.format(scan_id_dark_field))
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set_xlim((0, shape[0]))
@@ -276,12 +292,11 @@ if __name__ == '__main__':
         _clear_plt()
 
         shape = mean_diff_fiber_in.shape
-        np.savetxt(
-            'mean_fiber_in_minus_mean_dark_field.dat',
-            mean_diff_fiber_in[:, :],
-            # header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
-        )
-        print('=== Shape: {}'.format(shape))
+        print('Shape of mean_diff_fiber_in: {}'.format(shape))
+
+        save_dat_file(data=mean_diff_fiber_in, name='mean_fiber_in_minus_mean_dark_field.dat')
+        save_raw_image(data=mean_diff_fiber_in, name='mean_fiber_in_minus_mean_dark_field.tif')
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set_xlim((0, shape[0]))
@@ -301,12 +316,11 @@ if __name__ == '__main__':
         _clear_plt()
 
         shape = mean_diff_fiber_out.shape
-        np.savetxt(
-            'mean_fiber_out_minus_mean_dark_field.dat',
-            mean_diff_fiber_out[:, :],
-            # header='X={} X={} X={}'.format(first_slice, second_slice, third_slice),
-        )
-        print('=== Shape: {}'.format(shape))
+        print('Shape of mean_diff_fiber_out: {}'.format(shape))
+
+        save_dat_file(data=mean_diff_fiber_out, name='mean_fiber_out_minus_mean_dark_field.dat')
+        save_raw_image(data=mean_diff_fiber_out, name='mean_fiber_out_minus_mean_dark_field.tif')
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set_xlim((0, shape[0]))

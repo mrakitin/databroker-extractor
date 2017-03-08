@@ -97,7 +97,11 @@ ENV/
 
 .idea/
 chx/*.png
+chx/*.tif
+chx/*.tiff
 chx/images/*.png
+chx/images/*.tif
+chx/images/*.tiff
 chx/*.dat
 chx/images/*.dat
 
