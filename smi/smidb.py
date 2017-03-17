@@ -115,19 +115,26 @@ def _clear_plt():
 
 
 if __name__ == '__main__':
-    plot_graphs = True
-    save_data_files = False
+    import argparse
 
+    # Plot a single graph:
+    parser = argparse.ArgumentParser(description='Plot 2D-intensity distribution')
+    parser.add_argument('-i', '--scan-id', dest='scan_id', default=-1, help='scan id')
+    parser.add_argument('-p', '--plot', dest='plot', action='store_false', help='plot graphs')
+    parser.add_argument('-s', '--save', dest='save', action='store_true', help='save data files')
+
+    args = parser.parse_args()
+
+    plot_graphs = args.plot
+    save_data_files = args.save
+    scan_ids = [int(args.scan_id)]
     if plot_graphs:
-        scan_ids = range(243, 255)
-        # scan_ids = [-3, -2]
         norm = None
         # norm = 'total'
         # norm = 'individual'
         plot_scans(scan_ids=scan_ids, norm=norm)
 
     if save_data_files:
-        scan_ids = range(243, 259 + 1)
         for scan_id in scan_ids:
             plot_scans(scan_ids=[scan_id], show=False)
             file_name = save_data(scan_id)
