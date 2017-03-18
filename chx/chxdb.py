@@ -12,7 +12,25 @@ import numpy as np
 from PIL import Image
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
-from uti_math import fwhm
+
+
+def fwhm(x, y):  # MR27092016
+    """The function searches x-values (roots) where y=0 based on linear interpolation, and calculates FWHM"""
+
+    def is_positive(num):
+        return True if num > 0 else False
+
+    positive = is_positive(y[0])
+    list_of_roots = []
+    for i in range(len(y)):
+        current_positive = is_positive(y[i])
+        if current_positive != positive:
+            list_of_roots.append(x[i - 1] + (x[i] - x[i - 1]) / (abs(y[i]) + abs(y[i - 1])) * abs(y[i - 1]))
+            positive = not positive
+    if len(list_of_roots) >= 2:
+        return abs(list_of_roots[-1] - list_of_roots[0])
+    else:
+        raise Exception('Number of roots is less than 2!')
 
 
 def get_and_plot(scan_id, save=False, field='', idx=None):
@@ -177,8 +195,8 @@ if __name__ == '__main__':
     # scan_id = '31a8fc'
     detector = 'xray_eye3_image'
 
-    harmonics_scan = False
-    fiber_scan = True
+    harmonics_scan = True
+    fiber_scan = False
     pinhole_scan = False
     list_scans = False
 
@@ -194,30 +212,32 @@ if __name__ == '__main__':
             # ID harmonic: 5th energy: 9.65keV gap: 6.640
             # Ti foil, elm: 50pC, .1s .05x.05,.1x.4
             #     100pC, .1s .2x.4
-            ('1eff511d', 'ivu_gap'),
-            ('8f6a6004', 'ivu_gap'),
-            ('1f1422b4', 'ivu_gap'),
-            ('7949f1b0', 'dcm_b'),
-            ('daeb15e3', 'dcm_b'),
-            ('6edfa33a', 'dcm_b'),
+            # ('1eff511d', 'ivu_gap'),
+            # ('8f6a6004', 'ivu_gap'),
+            # ('1f1422b4', 'ivu_gap'),
+            # ('7949f1b0', 'dcm_b'),
+            # ('daeb15e3', 'dcm_b'),
+            # ('6edfa33a', 'dcm_b'),
             # center vertical mbs on ID cone: 0.6x1.2 (pbs) .4x.1 (mbs)  17599 (scan#)
             # ID harmonic: 7th energy: 9.75keV gap: 5.240 can't scan gap at 9.65keV...
             # Ti foil, elm: 50pC, .1s .05x.05,.1x.4
             #     100pC, .1s .2x.4
-            ('74798cb6', 'ivu_gap'),
-            ('dc2b5045', 'ivu_gap'),
-            ('c4f95268', 'ivu_gap'),
-            ('b2365717', 'dcm_b'),
-            ('ac99ddd0', 'dcm_b'),
-            ('b808a890', 'dcm_b'),
+            # ('74798cb6', 'ivu_gap'),
+            # ('dc2b5045', 'ivu_gap'),
+            # ('c4f95268', 'ivu_gap'),
+            # ('b2365717', 'dcm_b'),
+            # ('ac99ddd0', 'dcm_b'),
+            # ('b808a890', 'dcm_b'),
             # center vertical mbs on ID cone: 0.6x1.2 (pbs) .4x.1 (mbs) 17610 (scan#)
             # gap scan: #17613
             # ID harmonic: 7th energy: 9.65keV gap: 5.2017
             # Ti foil, elm: 50pC, .1s .05x.05,.1x.4
             #     100pC, .1s .2x.4
-            ('e23fb7a1', 'dcm_b'),
-            ('afc6da9e', 'dcm_b'),
-            ('e71b8b5f', 'dcm_b'),
+            # ('e23fb7a1', 'dcm_b'),
+            # ('afc6da9e', 'dcm_b'),
+            # ('e71b8b5f', 'dcm_b'),
+            # 2017-03-18 (elevation studies):
+            ('809d548e', 'dcm_b'),
         ]
 
         save = True
