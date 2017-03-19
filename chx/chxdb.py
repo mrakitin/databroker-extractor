@@ -9,7 +9,7 @@ import datetime
 import time
 
 import numpy as np
-import xfuncs as xf
+import xfuncs as xf  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
 from PIL import Image
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
@@ -34,7 +34,7 @@ def fwhm(x, y):  # MR27092016
         raise Exception('Number of roots is less than 2!')
 
 
-def get_and_plot(scan_id, save=False, field='', idx=None, is_vs_energy=False):
+def get_and_plot(scan_id, save=False, field='', intensity_field='elm_sum_all', idx=None, is_vs_energy=False):
     """Get data from table and plot it (produces Intensity vs. Ugap or mono angle).
 
     :param scan_id: scan id from bluesky.
@@ -43,7 +43,7 @@ def get_and_plot(scan_id, save=False, field='', idx=None, is_vs_energy=False):
     :param idx: index of the image (used as a part of the name in the saving process).
     :return: None.
     """
-    g, e, t = get_data(scan_id, field=field)
+    g, e, t = get_data(scan_id, field=field, intensity_field=intensity_field)
     if is_vs_energy:
         g = xf.get_EBragg('Si111cryo', np.abs(g)) * 1e3  # keV -> eV
     plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, field=field, idx=idx, is_vs_energy=is_vs_energy)
