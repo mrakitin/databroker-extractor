@@ -9,6 +9,7 @@ import datetime
 import time
 
 import numpy as np
+import xfuncs as xf
 from PIL import Image
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
@@ -33,7 +34,7 @@ def fwhm(x, y):  # MR27092016
         raise Exception('Number of roots is less than 2!')
 
 
-def get_and_plot(scan_id, save=False, field='', idx=None):
+def get_and_plot(scan_id, save=False, field='', idx=None, is_vs_energy=False):
     """Get data from table and plot it (produces Intensity vs. Ugap or mono angle).
 
     :param scan_id: scan id from bluesky.
@@ -43,7 +44,9 @@ def get_and_plot(scan_id, save=False, field='', idx=None):
     :return: None.
     """
     g, e, t = get_data(scan_id, field=field)
-    plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, field=field, idx=idx)
+    if is_vs_energy:
+        g = xf.get_EBragg('Si111cryo', np.abs(g)) * 1e3  # keV -> eV
+    plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, field=field, idx=idx, is_vs_energy=is_vs_energy)
 
 
 def get_data(scan_id, field='ivu_gap', intensity_field='elm_sum_all', det=None, debug=False):
@@ -99,7 +102,7 @@ def get_scans_list(keyword):
     return db(keyword)
 
 
-def plot_scan(x, y, scan_id, timestamp, save, field, idx):
+def plot_scan(x, y, scan_id, timestamp, save, field, idx, is_vs_energy):
     """Plot intensities vs. scan variable.
 
     :param x: scan variable.
@@ -119,6 +122,11 @@ def plot_scan(x, y, scan_id, timestamp, save, field, idx):
         units = 'deg'
     else:
         raise ValueError('Unknown field: {}'.format(field))
+
+    if is_vs_energy:
+        field = 'energy'
+        units = 'eV'
+
     try:
         y_norm = (y - np.min(y)) / (np.max(y) - np.min(y)) - 0.5  # roots are at Y=0
         fwhm_value = fwhm(x, y_norm)
@@ -240,11 +248,11 @@ if __name__ == '__main__':
             ('809d548e', 'dcm_b'),
         ]
 
-        save = True
-        # save = False
+        # save = True
+        save = False
 
         for i, scan_id in enumerate(scan_ids):
-            get_and_plot(scan_id[0], save=save, field=scan_id[1], idx=i)
+            get_and_plot(scan_id[0], save=save, field=scan_id[1], idx=i, is_vs_energy=True)
 
     if fiber_scan:
         first_slice = 1000
