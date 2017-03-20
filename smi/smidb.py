@@ -99,13 +99,19 @@ def read_single_scan(scan_id, x_label='bragg', y_label='VFMcamroi1'):
     }
 
 
-def save_data(scan_id):
+def save_data(scan_id, columns_from_plots=False, index=False):
+    """Save data to a file.
+
+    :param scan_id: scan id to save data for.
+    :param columns_from_plots: save columns from plots (all columns are saved by default).
+    :param index: if print the index column.
+    :return file_name: name of the saved file.
+    """
     d = read_single_scan(scan_id)
     file_name = 'scan_{}.dat'.format(d['scan_id'])
-    data = np.zeros((len(d['x']), 2))
-    data[:, 0] = d['x']
-    data[:, 1] = d['y']
-    np.savetxt(file_name, data, fmt='%10.6f %8d', header='{:12s} {:8s}'.format(d['x_label'], d['y_label']))
+    columns = [d['x_label'], d['y_label']] if columns_from_plots else None
+    with open(file_name, 'w') as f:
+        f.write(d['data'].to_string(columns=columns, index=index, justify='left'))
     return file_name
 
 
@@ -142,6 +148,10 @@ if __name__ == '__main__':
     # Save data:
     parser.add_argument('-s', '--save-ids', dest='save_ids', default=None, nargs='*',
                         help='save data for blank-separated scan ids list')
+    parser.add_argument('-c', '--columns-from-plots', dest='columns_from_plots', action='store_true',
+                        help='save columns from plots')
+    parser.add_argument('-x', '--hide-index-column', dest='hide_index_column', action='store_false',
+                        help='hide index column in the saved file(s)')
 
     args = parser.parse_args()
 
@@ -157,5 +167,9 @@ if __name__ == '__main__':
         scan_ids = _parse_scan_ids(args.save_ids)
         for scan_id in scan_ids:
             plot_scans(scan_ids=[scan_id], show=False)
-            file_name = save_data(scan_id)
+            file_name = save_data(
+                scan_id=scan_id,
+                columns_from_plots=args.columns_from_plots,
+                index=args.hide_index_column,
+            )
             print('Saved {}'.format(file_name))
