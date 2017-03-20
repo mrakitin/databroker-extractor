@@ -8,7 +8,7 @@ from uti_math import fwhm as calc_fwhm
 
 
 def fit_quadratic():
-    #TODO: implement quadratic fitting using lmfit library.
+    # TODO: implement quadratic fitting using lmfit library.
     pass
 
 
@@ -101,7 +101,7 @@ def read_single_scan(scan_id, x_label='bragg', y_label='VFMcamroi1'):
 
 def save_data(scan_id):
     d = read_single_scan(scan_id)
-    file_name = 'scan_{}.dat'.format(scan_id)
+    file_name = 'scan_{}.dat'.format(d['scan_id'])
     data = np.zeros((len(d['x']), 2))
     data[:, 0] = d['x']
     data[:, 1] = d['y']
@@ -119,31 +119,42 @@ def _clear_plt():
     plt.close()
 
 
+def _parse_scan_ids(scans_list):
+    try:
+        scan_ids = [int(x) for x in scans_list]
+    except:
+        raise ValueError('Incorrect scan ids provided: {}'.format(scans_list))
+    if not scan_ids:
+        scan_ids = [-1]
+    return scan_ids
+
+
 if __name__ == '__main__':
     import argparse
 
     # Plot a single graph:
-    parser = argparse.ArgumentParser(description='Plot 2D-intensity distribution')
-    parser.add_argument('-i', '--scan-id', dest='scan_id', default=-1, help='scan id')
-    parser.add_argument('-l', '--scans-list', dest='scans_list', default=None, help='scan id')
-    parser.add_argument('-p', '--plot', dest='plot', action='store_false', help='plot graphs')
-    parser.add_argument('-s', '--save', dest='save', action='store_true', help='save data files')
+    parser = argparse.ArgumentParser(description='Visualize data for NSLS-II SMI beamline')
+    # Plot data:
+    parser.add_argument('-p', '--plot-ids', dest='plot_ids', default=None, nargs='*',
+                        help='plot data for blank-separated scan ids list')
+    parser.add_argument('-n', '--norm-plots', dest='norm_plots', default=None, choices=('total', 'individual'),
+                        help='normalize plots')
+    # Save data:
+    parser.add_argument('-s', '--save-ids', dest='save_ids', default=None, nargs='*',
+                        help='save data for blank-separated scan ids list')
 
     args = parser.parse_args()
 
-    plot_graphs = args.plot
-    save_data_files = args.save
-    if args.scans_list:
-        scan_ids = [int(x) for x in args.scans_list.split(',')]
-    else:
-        scan_ids = [int(args.scan_id)]
-    if plot_graphs:
-        norm = None
-        # norm = 'total'
-        # norm = 'individual'
-        plot_scans(scan_ids=scan_ids, norm=norm)
+    if args.plot_ids is None and args.save_ids is None:
+        parser.print_help()
+        parser.exit()
 
-    if save_data_files:
+    if args.plot_ids is not None:
+        scan_ids = _parse_scan_ids(args.plot_ids)
+        plot_scans(scan_ids=scan_ids, norm=args.norm_plots)
+
+    if args.save_ids is not None:
+        scan_ids = _parse_scan_ids(args.save_ids)
         for scan_id in scan_ids:
             plot_scans(scan_ids=[scan_id], show=False)
             file_name = save_data(scan_id)

@@ -9,10 +9,11 @@ import datetime
 import time
 
 import numpy as np
-import xfuncs as xf  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
 from PIL import Image
 from databroker import db, get_fields, get_images, get_table
 from matplotlib import pyplot as plt
+
+from .xfuncs import get_EBragg  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
 
 
 def fwhm(x, y):  # MR27092016
@@ -45,7 +46,7 @@ def get_and_plot(scan_id, save=False, field='', intensity_field='elm_sum_all', i
     """
     g, e, t = get_data(scan_id, field=field, intensity_field=intensity_field)
     if is_vs_energy:
-        g = xf.get_EBragg('Si111cryo', np.abs(g)) * 1e3  # keV -> eV
+        g = get_EBragg('Si111cryo', np.abs(g)) * 1e3  # keV -> eV
     plot_scan(g, e, scan_id=scan_id, timestamp=t, save=save, field=field, idx=idx, is_vs_energy=is_vs_energy)
 
 
