@@ -96,16 +96,7 @@ ENV/
 .ropeproject
 
 .idea/
-chx/*.png
-chx/*.tif
-chx/*.tiff
-chx/images/*.png
-chx/images/*.tif
-chx/images/*.tiff
-chx/*.dat
-chx/images/*.dat
-
-smi/*.png
-smi/images/*.png
-smi/*.dat
-smi/images/*.dat
+*.png
+*.tif
+*.tiff
+*.dat
