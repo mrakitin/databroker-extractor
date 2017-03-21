@@ -32,10 +32,20 @@ def clear_plt():
     plt.close()
 
 
-def fit_quadratic():
-    # TODO: implement quadratic fitting using lmfit library.
+def fit_linear(x, y):
+    """See https://lmfit.github.io/lmfit-py/model.html."""
+    m = lmfit.models.LinearModel()
+    params = m.make_params(a=1, b=2)
+    model_result = m.fit(data=y, params=params, x=x)
+    return model_result
+
+
+def fit_quadratic(x, y):
+    """See https://lmfit.github.io/lmfit-py/model.html."""
     m = lmfit.models.QuadraticModel()
-    pass
+    params = m.make_params(a=1, b=2, c=3)
+    model_result = m.fit(data=y, params=params, x=x)
+    return model_result
 
 
 def normalize(y, shift=0.5):
