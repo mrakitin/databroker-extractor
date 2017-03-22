@@ -1,15 +1,5 @@
+import common.command_line as cl
 from smi.smidb import plot_scans, save_data
-
-
-def _parse_scan_ids(scans_list):
-    try:
-        scan_ids = [int(x) for x in scans_list]
-    except:
-        raise ValueError('Incorrect scan ids provided: {}'.format(scans_list))
-    if not scan_ids:
-        scan_ids = [-1]
-    return scan_ids
-
 
 if __name__ == '__main__':
     import argparse
@@ -39,7 +29,7 @@ if __name__ == '__main__':
         parser.exit()
 
     if args.plot_ids is not None:
-        scan_ids = _parse_scan_ids(args.plot_ids)
+        scan_ids = cl.parse_scan_ids(args.plot_ids)
         kwargs = {
             'scan_ids': scan_ids,
             'norm': args.norm_plots,
@@ -51,7 +41,7 @@ if __name__ == '__main__':
         plot_scans(**kwargs)
 
     if args.save_ids is not None:
-        scan_ids = _parse_scan_ids(args.save_ids)
+        scan_ids = cl.parse_scan_ids(args.save_ids)
         for scan_id in scan_ids:
             plot_scans(scan_ids=[scan_id], show=False)
             file_name = save_data(

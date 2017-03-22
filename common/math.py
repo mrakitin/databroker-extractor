@@ -1,13 +1,22 @@
 import lmfit
 import numpy as np
-from matplotlib import pyplot as plt
 
 
-def calc_fwhm(x, y):  # MR27092016
-    """The function searches x-values (roots) where y=0 based on linear interpolation, and calculates FWHM"""
+def calc_fwhm(x, y, shift=0.5):  # MR21032017
+    """The function searches x-values (roots) where y=0 (after normalization to values between 0 and 1 and shifting the
+    values down by 0.5 (default value)) based on linear interpolation, and calculates full width at half maximum (FWHM).
+
+    :param x: an array of x values.
+    :param y: an array of y values.
+    :param shift: an optional shift to be used in the process of normalization (between 0 and 1).
+    :return: a dictionary consisting of 'fwhm' and 'x_range'
+    """
 
     def is_positive(num):
         return True if num > 0 else False
+
+    # Normalize values first:
+    y = (y - np.min(y)) / (np.max(y) - np.min(y)) - shift  # roots are at Y=0
 
     positive = is_positive(y[0])
     list_of_roots = []
@@ -17,19 +26,12 @@ def calc_fwhm(x, y):  # MR27092016
             list_of_roots.append(x[i - 1] + (x[i] - x[i - 1]) / (abs(y[i]) + abs(y[i - 1])) * abs(y[i - 1]))
             positive = not positive
     if len(list_of_roots) >= 2:
-        return abs(list_of_roots[-1] - list_of_roots[0])
+        return {
+            'fwhm': abs(list_of_roots[-1] - list_of_roots[0]),
+            'x_range': list_of_roots,
+        }
     else:
         raise Exception('Number of roots is less than 2!')
-
-
-def clear_plt():
-    """Clear the plots (useful when plotting in a loop).
-
-    :return: None
-    """
-    plt.cla()
-    plt.clf()
-    plt.close()
 
 
 def fit_linear(x, y):
@@ -46,7 +48,3 @@ def fit_quadratic(x, y):
     params = m.make_params(a=1, b=2, c=3)
     model_result = m.fit(data=y, params=params, x=x)
     return model_result
-
-
-def normalize(y, shift=0.5):
-    return (y - np.min(y)) / (np.max(y) - np.min(y)) - shift  # roots are at Y=0

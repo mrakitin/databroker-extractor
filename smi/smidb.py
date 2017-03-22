@@ -1,22 +1,22 @@
-import datetime
-import time
-
 import numpy as np
 from databroker import db, get_fields, get_table
 from matplotlib import pyplot as plt
 
-import common.functions as cf
+import common.date_time as c_dt
+import common.io as c_io
+import common.math as c_math
+import common.plot as c_plot
 
 X_LABEL = 'bragg'
 Y_LABEL = 'VFMcamroi1'
 
 
-def plot_scans(scan_ids, offset_hours=-5, norm=None, x_label=X_LABEL, y_label=Y_LABEL, show=True):
-    timestamp = datetime.datetime.fromtimestamp(time.time() + offset_hours * 3600).strftime('%Y-%m-%d_%H_%M_%S')
+def plot_scans(scan_ids, offset_hours=0, norm=None, x_label=X_LABEL, y_label=Y_LABEL, show=True):
+    timestamp = c_dt.current_time(offset_hours=offset_hours, for_file_name=True)
     d = read_scans(scan_ids=scan_ids, x_label=x_label, y_label=y_label)
     y_max = np.array(d['y_list']).max()
 
-    cf.clear_plt()
+    c_plot.clear_plt()
 
     for i in range(len(scan_ids)):
         x = d['x_list'][i]
@@ -76,7 +76,7 @@ def read_single_scan(scan_id, x_label=X_LABEL, y_label=Y_LABEL):
     x = np.array(data[x_label])
     y = np.array(data[y_label])
     try:
-        fwhm = cf.calc_fwhm(x, cf.normalize(y))
+        fwhm = c_math.calc_fwhm(x, y)
     except:
         fwhm = -1
 
@@ -90,7 +90,7 @@ def read_single_scan(scan_id, x_label=X_LABEL, y_label=Y_LABEL):
         'y': y,
         'x_label': x_label,
         'y_label': y_label,
-        'fwhm': fwhm,
+        'fwhm': fwhm['fwhm'],
     }
 
 
@@ -105,6 +105,10 @@ def save_data(scan_id, columns_from_plots=False, index=False):
     d = read_single_scan(scan_id)
     file_name = 'scan_{}.dat'.format(d['scan_id'])
     columns = [d['x_label'], d['y_label']] if columns_from_plots else None
-    with open(file_name, 'w') as f:
-        f.write(d['data'].to_string(columns=columns, index=index, justify='left'))
+    c_io.save_data_pandas(
+        file_name=file_name,
+        data=d['data'],
+        columns=columns,
+        index=index,
+    )
     return file_name

@@ -1,6 +1,6 @@
 import numpy as np
 
-from common.functions import fit_linear, fit_quadratic
+from common.math import fit_linear, fit_quadratic
 
 if __name__ == '__main__':
     """
