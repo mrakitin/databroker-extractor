@@ -2,7 +2,6 @@ import databroker as db
 import numpy as np
 from matplotlib import pyplot as plt
 
-import chx.chxdb as chx
 import common.databroker as c_db
 import common.date_time as c_dt
 import common.io as c_io

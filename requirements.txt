@@ -1,6 +1,7 @@
 lmfit
 numpy
 matplotlib
+pillow
 git+https://github.com/NSLS-II/databroker#egg=databroker
 git+https://github.com/NSLS-II/metadatastore#egg=metadatastore
 git+https://github.com/NSLS-II/filestore#egg=filestore
