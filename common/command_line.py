@@ -34,6 +34,7 @@ def parse_command_line():
     parser.add_argument('-y', '--y-label', dest='y_label', default=None, help='y label to plot')
     parser.add_argument('--x-units', dest='x_units', default=None, help='x units')
     parser.add_argument('--y-units', dest='y_units', default=None, help='y units')
+    parser.add_argument('--scatter-size', dest='scatter_size', default=None, help='scatter size')
     parser.add_argument('-e', '--convert-to-energy', dest='convert_to_energy', action='store_true',
                         help='convert to energy from Bragg diffraction angle')
 

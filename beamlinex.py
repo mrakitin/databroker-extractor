@@ -14,21 +14,28 @@ if __name__ == '__main__':
     x_units = args.x_units if args.x_units else cl.get_beamline_units(config_dict=config_dict, units='x_units')
     y_units = args.y_units if args.y_units else cl.get_beamline_units(config_dict=config_dict, units='y_units')
 
-    if args.plot_ids is not None:
-        scan_ids = cl.parse_scan_ids(args.plot_ids)
-        kwargs = {
-            'scan_ids': scan_ids,
-            'norm': args.norm_plots,
-            'timestamp': args.timestamp,
-            'extension': args.graph_extension,
-            'x_label': x_label,
-            'y_label': y_label,
-            'x_units': x_units,
-            'y_units': y_units,
-            'convert_to_energy': args.convert_to_energy,
-        }
+    plot_kwargs = {
+        'timestamp': args.timestamp,
+        'extension': args.graph_extension,
+        'norm': args.norm_plots,
+        'x_label': x_label,
+        'y_label': y_label,
+        'x_units': x_units,
+        'y_units': y_units,
+        'convert_to_energy': args.convert_to_energy,
+    }
+    if args.scatter_size:
+        plot_kwargs['scatter_size'] = args.scatter_size
 
-        c_plot.plot_scans(**kwargs)
+    save_kwargs = {
+        'timestamp': args.timestamp,
+        'extension': args.data_extension,
+        'columns': args.columns,
+        'index': args.hide_index_column,
+    }
+
+    if args.plot_ids is not None:
+        c_plot.plot_scans(scan_ids=cl.parse_scan_ids(args.plot_ids), **plot_kwargs)
 
     if save_files:
         if args.save_ids is not None:
@@ -38,27 +45,6 @@ if __name__ == '__main__':
 
         print('The following scan ids will be saved: {}'.format(scan_ids))
         for scan_id in scan_ids:
-            kwargs = {
-                'timestamp': args.timestamp,
-                'extension': args.graph_extension,
-            }
-            c_plot.plot_scans(
-                scan_ids=[scan_id],
-                x_label=x_label,
-                y_label=y_label,
-                x_units=x_units,
-                y_units=y_units,
-                norm=args.norm_plots,
-                show=False,
-                convert_to_energy=args.convert_to_energy,
-                **kwargs
-            )
-
-            kwargs['extension'] = args.data_extension
-            file_name = c_io.save_data(
-                scan_id=scan_id,
-                columns=args.columns,
-                index=args.hide_index_column,
-                **kwargs
-            )
+            c_plot.plot_scans(scan_ids=[scan_id], show=False, **plot_kwargs)
+            file_name = c_io.save_data(scan_id=scan_id, **save_kwargs)
             print('    Saved {}'.format(file_name))

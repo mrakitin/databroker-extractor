@@ -10,7 +10,7 @@ import common.date_time as c_dt
 import common.io as c_io
 
 
-def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True,
+def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True, scatter_size=10,
                figsize=(10, 7.5), extension='png', convert_to_energy=False, material='Si111cryo', **kwargs):
     assert len(scan_ids) >= 1, 'The number of scan ids is empty'
     d = c_db.read_scans(scan_ids=scan_ids, x_label=x_label, y_label=y_label,
@@ -54,7 +54,7 @@ def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None
             pass
         else:
             raise ValueError('{}: the provided normalization method is not implemented.'.format(norm))
-        ax.scatter(x, y, label='scan_id={},\nFWHM={:.5f} {}'.format(
+        ax.scatter(x, y, s=scatter_size, label='scan_id={},\nFWHM={:.5f} {}'.format(
             d['real_scan_ids'][i],
             d['fwhm_values'][i],
             x_units,
