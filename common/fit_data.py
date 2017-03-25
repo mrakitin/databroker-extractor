@@ -12,47 +12,79 @@ import common.command_line as cl
 import common.plot as c_plot
 
 
-def main(study='elevation', no_save=True):
-    allowed_values = ('elevation', 'taper')
-    assert study in allowed_values, '{}: incorrect study name.  Allowed values: {}'.format(study, allowed_values)
+def fit_data(beamline, study='elevation', no_save=True):
+    allowed_beamlines = ('chx', 'CHX', 'smi', 'SMI')
+    assert beamline in allowed_beamlines, '{}: incorrect beamline.  Allowed values: {}'.format(study, allowed_beamlines)
+
     # data provided
     # x=np.array([1.0,2.5,3.5,4.0,1.1,1.8,2.2,3.7])
     # y=np.array([6.008,15.722,27.130,33.772,5.257,9.549,11.098,28.828])
 
-    harmonics = {
-        1: '7th harmonic',
-        2: '17th harmonic',
-        3: '18th harmonic',
-    }
+    if beamline.lower() == 'smi':
+        allowed_values = ('elevation', 'taper')
+        assert study in allowed_values, '{}: incorrect study name.  Allowed values: {}'.format(study, allowed_values)
 
-    if study == 'elevation':
-        # Elevation parameters:
-        x_units = 'mm'
-        x_label = 'Elevation [{}]'.format(x_units)
-        y_label = 'FWHM [deg]'
-        data = np.array([
-            [-0.250, 0.08160, 0.03711, 0.03387],
-            [-0.300, 0.07915, 0.03576, 0.03318],
-            [-0.375, 0.07836, 0.03555, 0.03260],  # 7th harmonic scan #311
-            [-0.450, 0.07477, 0.03595, 0.03252],
-            [-0.500, 0.07688, 0.03712, 0.03313],
-        ])
-    elif study == 'taper':
-        # Taper parameters:
-        x_units = 'µm'
-        x_label = 'Taper [{}]'.format(x_units)
-        y_label = 'FWHM [deg]'
-        data = np.array([
-            [18.2, 0.09091, 0.04181, 0.03983],
-            [8.5, 0.08191, 0.03745, 0.03437],
-            [0.14, 0.07738, 0.03570, 0.03258],
-            [-4.8, 0.07652, 0.03510, 0.03274],
-            [-10, 0.07636, 0.03621, 0.03369],
-            [-15, 0.07547, 0.03700, 0.03501],
-            [-22, 0.07720, 0.03715, 0.03800],
-        ])
-    else:
-        raise ValueError('Unknown study name: {}'.format(study))
+        harmonics = {
+            1: '7th harmonic',
+            2: '17th harmonic',
+            3: '18th harmonic',
+        }
+
+        if study == 'elevation':
+            # Elevation parameters:
+            x_units = 'mm'
+            x_label = 'Elevation [{}]'.format(x_units)
+            y_label = 'FWHM [deg]'
+            data = np.array([
+                [-0.250, 0.08160, 0.03711, 0.03387],
+                [-0.300, 0.07915, 0.03576, 0.03318],
+                [-0.375, 0.07836, 0.03555, 0.03260],  # 7th harmonic scan #311
+                [-0.450, 0.07477, 0.03595, 0.03252],
+                [-0.500, 0.07688, 0.03712, 0.03313],
+            ])
+        elif study == 'taper':
+            # Taper parameters:
+            x_units = 'µm'
+            x_label = 'Taper [{}]'.format(x_units)
+            y_label = 'FWHM [deg]'
+            data = np.array([
+                [18.2, 0.09091, 0.04181, 0.03983],
+                [8.5, 0.08191, 0.03745, 0.03437],
+                [0.14, 0.07738, 0.03570, 0.03258],
+                [-4.8, 0.07652, 0.03510, 0.03274],
+                [-10, 0.07636, 0.03621, 0.03369],
+                [-15, 0.07547, 0.03700, 0.03501],
+                [-22, 0.07720, 0.03715, 0.03800],
+            ])
+        else:
+            raise ValueError('Unknown study name: {}'.format(study))
+
+    elif beamline.lower() == 'chx':
+        allowed_values = ('elevation')
+        assert study in allowed_values, '{}: incorrect study name.  Allowed values: {}'.format(study, allowed_values)
+
+        harmonics = {
+            1: '7th harmonic',
+            2: '11th harmonic',
+        }
+
+        if study == 'elevation':
+            # Elevation parameters:
+            x_units = 'mm'
+            x_label = 'Elevation [{}]'.format(x_units)
+            y_label = 'FWHM [deg]'
+            data = np.array([
+                [0.150, 0.06885, 0.04420],
+                [0.100, 0.06303, 0.03978],
+                [0.050, 0.05874, 0.03663],
+                [0.0005, 0.05851, 0.03588],
+                [-0.0085, 0.05742, 0.03560],
+                [-0.050, 0.05826, 0.03708],
+                [-0.100, 0.06067, 0.03840],
+                [-0.150, 0.06654, 0.04276],
+            ])
+        else:
+            raise ValueError('Unknown study name: {}'.format(study))
 
     x = data[:, 0]
     for i in sorted(harmonics.keys()):
@@ -127,4 +159,4 @@ def main(study='elevation', no_save=True):
 
 if __name__ == "__main__":
     args = cl.parse_studies()
-    main(study=args.study, no_save=args.no_save)
+    fit_data(beamline=args.beamline, study=args.study, no_save=args.no_save)
