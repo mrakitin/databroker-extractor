@@ -11,7 +11,7 @@ import common.io as c_io
 
 
 def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True, scatter_size=10,
-               figsize=(10, 7.5), extension='png', convert_to_energy=False, material='Si111cryo', **kwargs):
+               figsize=(8, 6), extension='png', convert_to_energy=False, material='Si111cryo', **kwargs):
     assert len(scan_ids) >= 1, 'The number of scan ids is empty'
     d = c_db.read_scans(scan_ids=scan_ids, x_label=x_label, y_label=y_label,
                         convert_to_energy=convert_to_energy, material=material)
