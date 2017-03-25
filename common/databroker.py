@@ -8,6 +8,16 @@ import numpy as np
 import common.math as c_math
 
 
+def check_columns(data, columns):
+    if columns is None:
+        return True
+    available_columns = list(data.columns)
+    for c in columns:
+        if c not in available_columns:
+            raise ValueError('{}: invalid column(s). Available columns: {}'.format(c, available_columns))
+    return True
+
+
 def get_scans_list(keyword):
     """Get a list of scan filtered by the provided keyword.
 
@@ -50,10 +60,18 @@ def read_single_scan(scan_id, x_label=None, y_label=None, convert_to_energy=Fals
     scan = db.db[scan_id]
     fields = db.get_fields(scan)
     data = scan_data(scan_id)
-    x = x_label if not x_label else np.array(data[x_label])
+    if x_label is not None:
+        if check_columns(data=data, columns=[x_label]):
+            x = np.array(data[x_label])
+    else:
+        x = None
     if convert_to_energy:
         x = xf.get_EBragg(material, np.abs(x)) * 1e3  # keV -> eV
-    y = y_label if not y_label else np.array(data[y_label])
+    if y_label is not None:
+        if check_columns(data=data, columns=[y_label]):
+            y = np.array(data[y_label])
+        else:
+            y = None
     try:
         fwhm = c_math.calc_fwhm(x, y)['fwhm']
     except:

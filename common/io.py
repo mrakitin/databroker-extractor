@@ -46,11 +46,9 @@ def save_data(scan_id, columns=None, index=False, extension='dat', **kwargs):
 
 
 def save_data_pandas(file_name, data, columns, index, justify='left'):
-    with open(file_name, 'w') as f:
-        try:
+    if c_db.check_columns(data=data, columns=columns):
+        with open(file_name, 'w') as f:
             f.write(data.to_string(columns=columns, index=index, justify=justify))
-        except KeyError:
-            raise ValueError('{}: invalid column(s). Available columns: {}'.format(columns, list(data.columns)))
 
 
 def save_data_numpy(data, name, header=None):
