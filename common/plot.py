@@ -10,8 +10,8 @@ import common.date_time as c_dt
 import common.io as c_io
 
 
-def plot_scans(scan_ids, x_label, y_label, norm=None, save=True, show=True, figsize=(10, 7.5), extension='png',
-               convert_to_energy=True, material='Si111cryo', **kwargs):
+def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True,
+               figsize=(10, 7.5), extension='png', convert_to_energy=False, material='Si111cryo', **kwargs):
     assert len(scan_ids) >= 1, 'The number of scan ids is empty'
     d = c_db.read_scans(scan_ids=scan_ids, x_label=x_label, y_label=y_label,
                         convert_to_energy=convert_to_energy, material=material)
@@ -37,10 +37,11 @@ def plot_scans(scan_ids, x_label, y_label, norm=None, save=True, show=True, figs
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
 
-    units = ''
+    orig_x_label = x_label
+    orig_x_units = x_units
     if convert_to_energy:
-        units = 'eV'
-        x_label = 'Photon energy [{}]'.format(units)
+        x_label = 'Photon energy'
+        x_units = 'eV'
 
     for i in range(len(scan_ids)):
         x = d['x_list'][i]
@@ -56,7 +57,7 @@ def plot_scans(scan_ids, x_label, y_label, norm=None, save=True, show=True, figs
         ax.scatter(x, y, label='scan_id={},\nFWHM={:.5f} {}'.format(
             d['real_scan_ids'][i],
             d['fwhm_values'][i],
-            units,
+            x_units,
         ))
         ax.plot(x, y, '--')
 
@@ -69,8 +70,8 @@ def plot_scans(scan_ids, x_label, y_label, norm=None, save=True, show=True, figs
         )
     )
 
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
+    ax.set_xlabel(_format_label(x_label, x_units, orig_label=orig_x_label, orig_units=orig_x_units))
+    ax.set_ylabel(_format_label(y_label, y_units))
     ax.grid()
 
     plt.tight_layout()
@@ -94,3 +95,12 @@ def clear_plt():
     plt.cla()
     plt.clf()
     plt.close()
+
+
+def _format_label(label, units, orig_label=None, orig_units=None):
+    if label == orig_label:
+        orig_label = None
+    label = '{} [{}]'.format(label, units) if units else label
+    if orig_label and orig_units:
+        label = '{} (orig. label: {} [{}])'.format(label, orig_label, orig_units)
+    return label

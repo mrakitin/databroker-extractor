@@ -1,0 +1,22 @@
+{
+    "CHX": {
+        "full_name": "Coherent Hard X-ray Scattering (CHX)",
+        "port": "11-ID",
+        "default_labels": {
+            "x_label": "dcm_b",
+            "x_units": "degrees",
+            "y_label": "elm_sum_all",
+            "y_units": "arb. units"
+        }
+    },
+    "SMI": {
+        "full_name": "Soft Matter Interfaces (SMI)",
+        "port": "12-ID",
+        "default_labels": {
+            "x_label": "bragg",
+            "x_units": "degrees",
+            "y_label": "VFMcamroi1",
+            "y_units": "arb. units"
+        }
+    }
+}

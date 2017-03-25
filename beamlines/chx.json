@@ -1,9 +1,0 @@
-{
-    "beamline_id": "CHX",
-    "full_name": "Coherent Hard X-ray Scattering (CHX)",
-    "port": "11-ID",
-    "default_labels": {
-        "x_label": "dcm_b",
-        "y_label": "elm_sum_all"
-    }
-}

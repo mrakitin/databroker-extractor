@@ -1,9 +1,0 @@
-{
-    "beamline_id": "SMI",
-    "full_name": "Soft Matter Interfaces (SMI)",
-    "port": "12-ID",
-    "default_labels": {
-        "x_label": "bragg",
-        "y_label": "VFMcamroi1"
-    }
-}

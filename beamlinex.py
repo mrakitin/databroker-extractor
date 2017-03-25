@@ -6,45 +6,13 @@ import common.io as c_io
 import common.plot as c_plot
 
 if __name__ == '__main__':
-    import argparse
+    args, save_files = cl.parse_command_line()
 
-    # Plot a single graph:
-    parser = argparse.ArgumentParser(description='Visualize data for NSLS-II beamlines')
-    # Plot data:
-    parser.add_argument('-p', '--plot-ids', dest='plot_ids', default=None, nargs='*',
-                        help='plot data for blank-separated scan ids list')
-    parser.add_argument('-n', '--norm-plots', dest='norm_plots', default=None, choices=('total', 'individual'),
-                        help='normalize plots')
-    parser.add_argument('-x', '--x-label', dest='x_label', default=None, help='x label to plot')
-    parser.add_argument('-y', '--y-label', dest='y_label', default=None, help='y label to plot')
-
-    # Save data:
-    parser.add_argument('-s', '--save-ids', dest='save_ids', default=None, nargs='*',
-                        help='save data for blank-separated scan ids list')
-    parser.add_argument('-r', '--range', dest='range_ids', default=None,
-                        help='save data for a range of scan ids list')
-    parser.add_argument('-c', '--columns', dest='columns', default=None, nargs='+',
-                        help='columns to save to a file')
-    parser.add_argument('-i', '--hide-index-column', dest='hide_index_column', action='store_false',
-                        help='hide index column in the saved file(s)')
-
-    # File name variables:
-    parser.add_argument('-t', '--timestamp', dest='timestamp', default=None, choices=('scan', 'current'),
-                        help='add scan (or current) timestamp to the name of the saved file')
-    parser.add_argument('-d', '--data-extension', dest='data_extension', default='dat',
-                        help='extension of the saved file')
-    parser.add_argument('-g', '--graph-extension', dest='graph_extension', default='png',
-                        help='extension of the saved graph')
-
-    args = parser.parse_args()
-
-    save_files = False
-    if args.save_ids is not None or args.range_ids is not None:
-        save_files = True
-
-    if args.plot_ids is None and not save_files:
-        parser.print_help()
-        parser.exit()
+    config_dict = cl.read_config(beamline=args.beamline)
+    x_label = args.x_label if args.x_label else cl.get_beamline_labels(config_dict=config_dict, label='x_label')
+    y_label = args.y_label if args.y_label else cl.get_beamline_labels(config_dict=config_dict, label='y_label')
+    x_units = args.x_units if args.x_units else cl.get_beamline_units(config_dict=config_dict, units='x_units')
+    y_units = args.y_units if args.y_units else cl.get_beamline_units(config_dict=config_dict, units='y_units')
 
     if args.plot_ids is not None:
         scan_ids = cl.parse_scan_ids(args.plot_ids)
@@ -53,11 +21,12 @@ if __name__ == '__main__':
             'norm': args.norm_plots,
             'timestamp': args.timestamp,
             'extension': args.graph_extension,
+            'x_label': x_label,
+            'y_label': y_label,
+            'x_units': x_units,
+            'y_units': y_units,
+            'convert_to_energy': args.convert_to_energy,
         }
-        if args.x_label:
-            kwargs['x_label'] = args.x_label
-        if args.y_label:
-            kwargs['y_label'] = args.y_label
 
         c_plot.plot_scans(**kwargs)
 
@@ -75,10 +44,13 @@ if __name__ == '__main__':
             }
             c_plot.plot_scans(
                 scan_ids=[scan_id],
-                x_label=args.x_label,
-                y_label=args.y_label,
+                x_label=x_label,
+                y_label=y_label,
+                x_units=x_units,
+                y_units=y_units,
                 norm=args.norm_plots,
                 show=False,
+                convert_to_energy=args.convert_to_energy,
                 **kwargs
             )
 

@@ -55,7 +55,7 @@ def read_single_scan(scan_id, x_label=None, y_label=None, convert_to_energy=Fals
         x = xf.get_EBragg(material, np.abs(x)) * 1e3  # keV -> eV
     y = y_label if not y_label else np.array(data[y_label])
     try:
-        fwhm = c_math.calc_fwhm(x, y)
+        fwhm = c_math.calc_fwhm(x, y)['fwhm']
     except:
         fwhm = -1
 
@@ -70,7 +70,7 @@ def read_single_scan(scan_id, x_label=None, y_label=None, convert_to_energy=Fals
         'y': y,
         'x_label': x_label,
         'y_label': y_label,
-        'fwhm': fwhm['fwhm'],
+        'fwhm': fwhm,
     }
 
 
