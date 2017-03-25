@@ -43,7 +43,7 @@ if __name__ == '__main__':
         else:
             scan_ids = cl.parse_range_ids(args.range_ids)
 
-        print('The following scan ids will be saved: {}'.format(scan_ids))
+        print('The following scan ids will be saved: {} ({} scans)'.format(scan_ids, len(scan_ids)))
         for scan_id in scan_ids:
             c_plot.plot_scans(scan_ids=[scan_id], show=False, **plot_kwargs)
             file_name = c_io.save_data(scan_id=scan_id, **save_kwargs)

@@ -8,18 +8,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import leastsq
 
+import common.command_line as cl
 import common.plot as c_plot
 
 
-def main():
+def main(study='elevation', no_save=True):
+    allowed_values = ('elevation', 'taper')
+    assert study in allowed_values, '{}: incorrect study name.  Allowed values: {}'.format(study, allowed_values)
     # data provided
     # x=np.array([1.0,2.5,3.5,4.0,1.1,1.8,2.2,3.7])
     # y=np.array([6.008,15.722,27.130,33.772,5.257,9.549,11.098,28.828])
-
-    save = True
-
-    study = 'elevation'
-    # study = 'taper'
 
     harmonics = {
         1: '7th harmonic',
@@ -33,7 +31,7 @@ def main():
         x_label = 'Elevation [{}]'.format(x_units)
         y_label = 'FWHM [deg]'
         data = np.array([
-            [-0.250, 0.08158, 0.03711, 0.03387],
+            [-0.250, 0.08160, 0.03711, 0.03387],
             [-0.300, 0.07915, 0.03576, 0.03318],
             [-0.375, 0.07836, 0.03555, 0.03260],  # 7th harmonic scan #311
             [-0.450, 0.07477, 0.03595, 0.03252],
@@ -51,7 +49,7 @@ def main():
             [-4.8, 0.07652, 0.03510, 0.03274],
             [-10, 0.07636, 0.03621, 0.03369],
             [-15, 0.07547, 0.03700, 0.03501],
-            [-22, 0.07718, 0.03715, 0.03800],
+            [-22, 0.07720, 0.03715, 0.03800],
         ])
     else:
         raise ValueError('Unknown study name: {}'.format(study))
@@ -120,7 +118,7 @@ def main():
         plt.legend()
         plt.grid()
         plt.tight_layout()
-        if save:
+        if not no_save:
             plt.savefig('{}_fit_{}.png'.format(study, harmonics[i]))
         else:
             plt.show()
@@ -128,4 +126,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = cl.parse_studies()
+    main(study=args.study, no_save=args.no_save)
