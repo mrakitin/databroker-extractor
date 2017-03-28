@@ -1,0 +1,5 @@
+database: datastore
+port: 27018
+host: localhost
+timezone: US/Eastern
+

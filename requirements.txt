@@ -1,7 +1,11 @@
-lmfit
 numpy
 matplotlib
+scipy
+lmfit
 pillow
+pyyaml
+attrs
+tifffile
 git+https://github.com/NSLS-II/databroker#egg=databroker
 git+https://github.com/NSLS-II/metadatastore#egg=metadatastore
 git+https://github.com/NSLS-II/filestore#egg=filestore
