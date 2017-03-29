@@ -5,6 +5,7 @@ Used to obtain data from beamline databroker servers and perform initial analysi
 
 ### Installation instructions:
 
+Install miniconda from https://conda.io/miniconda.html. Then create the environment for databroker:
 ```bash
 conda create --name py36 python=3.6 numpy scipy matplotlib
 activate py36
