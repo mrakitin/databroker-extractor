@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from beamlinex.common import command_line as cl
-from beamlinex.common import io as c_io
-from beamlinex.common import plot as c_plot
+import beamlinex.common.command_line as cl
+import beamlinex.common.io as c_io
+import beamlinex.common.plot as c_plot
 
 
 def beamlinex_cli():
