@@ -26,8 +26,8 @@ def fit_data(beamline, study='elevation', no_save=True):
 
         harmonics = {
             1: '7th harmonic',
-            2: '17th harmonic',
-            3: '18th harmonic',
+            # 2: '17th harmonic',
+            # 3: '18th harmonic',
         }
 
         if study == 'elevation':
@@ -36,11 +36,15 @@ def fit_data(beamline, study='elevation', no_save=True):
             x_label = 'Elevation [{}]'.format(x_units)
             y_label = 'FWHM [deg]'
             data = np.array([
-                [-0.250, 0.08160, 0.03711, 0.03387],
-                [-0.300, 0.07915, 0.03576, 0.03318],
-                [-0.375, 0.07836, 0.03555, 0.03260],  # 7th harmonic scan #311
-                [-0.450, 0.07477, 0.03595, 0.03252],
-                [-0.500, 0.07688, 0.03712, 0.03313],
+                [-0.200, 0.07161],  # scan_id = 565
+                [-0.150, 0.07109],  # scan_id = 566
+                [-0.100, 0.06995],  # scan_id = 567
+                [-0.050, 0.06963],  # scan_id = 569
+                [0.000, 0.06924],  # scan_id = 570
+                [0.050, 0.06981],  # scan_id = 571
+                [0.100, 0.06944],  # scan_id = 572
+                [0.150, 0.06904],  # scan_id = 573
+                [0.200, 0.06964],  # scan_id = 574
             ])
         elif study == 'taper':
             # Taper parameters:
