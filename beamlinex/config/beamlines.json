@@ -13,7 +13,7 @@
         "full_name": "Soft Matter Interfaces (SMI)",
         "port": "12-ID",
         "default_labels": {
-            "x_label": "bragg",
+            "x_label": "dcm_bragg",
             "x_units": "degrees",
             "y_label": "VFMcamroi1",
             "y_units": "arb. units"
