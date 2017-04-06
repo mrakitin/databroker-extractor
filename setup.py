@@ -11,7 +11,7 @@ package_data = {'beamlinex': ['config/beamlines.json']}
 
 setup(
     name='beamlinex',
-    version='20170329.000000',
+    version='20170405.000000',
     description='BeamlineX - tools and utilities for experiments',
     author='Maksim Rakitin',
     url='https://github.com/mrakitin/experiments',
