@@ -43,6 +43,8 @@ def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None
         x_label = 'Photon energy'
         x_units = 'eV'
 
+    scatter_size = float(scatter_size)
+
     for i in range(len(scan_ids)):
         x = d['x_list'][i]
         y = d['y_list'][i]
@@ -54,12 +56,21 @@ def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None
             pass
         else:
             raise ValueError('{}: the provided normalization method is not implemented.'.format(norm))
-        ax.scatter(x, y, s=scatter_size, label='scan_id={},\nFWHM={:.5f} {}'.format(
-            d['real_scan_ids'][i],
-            d['fwhm_values'][i],
-            x_units,
-        ))
-        ax.plot(x, y, '--')
+        plot_args = (x, y)
+        plot_kwargs = {
+            'label': 'scan_id={},\nFWHM={:.5f} {}'.format(
+                d['real_scan_ids'][i],
+                d['fwhm_values'][i],
+                x_units,
+            )
+        }
+        if scatter_size > 0:
+            func = 'scatter'
+            plot_kwargs['s'] = scatter_size
+            ax.plot(*plot_args, '--')
+        else:
+            func = 'plot'
+        getattr(ax, func)(*plot_args, **plot_kwargs)
 
     ax.legend()
 
