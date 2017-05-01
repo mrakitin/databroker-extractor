@@ -6,39 +6,42 @@ from beamlinex.common.io import save_data_numpy
 from beamlinex.common.plot import clear_plt
 
 
-def smi_fwhm_vs_current(reverse=False, current='mean', show=True):
+def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_energy=False, material=None,
+                    x_label='dcm_bragg', y_label='VFMcamroi1', beamline='SMI', ring_currents=None, harmonic=None):
     allowed_current_values = ('mean', 'peak', 'first', 'last')
     if current not in allowed_current_values:
         raise ValueError('{}: not allowed. Allowed values: {}'.format(current, allowed_current_values))
 
-    exclude = [529] + list(range(565, 584))
-
-    first = 418
-    last = 657
-
-    scans = []
-    for i in range(first, last + 1):
-        if not i in exclude:
-            scans.append(i)
-
     print('Scans list:\n{}'.format(scans))
 
     fwhm_vs_current = np.zeros((len(scans), 2))
-    fname = 'smi_fwhm_vs_current_{}_to_{}'.format(scans[0], scans[-1])
+    fname = '{}_fwhm_vs_current_{}_to_{}'.format(beamline.lower(), scans[0], scans[-1])
     for i, s in enumerate(scans):
         print('s={}'.format(s))
-        d = read_single_scan(s, x_label='dcm_bragg', y_label='VFMcamroi1')
+        d = read_single_scan(
+            s,
+            x_label=x_label,
+            y_label=y_label,
+            convert_to_energy=convert_to_energy,
+            material=material
+        )
         fwhm = d['fwhm']
-        if current == 'mean':
-            ring_current = np.mean(d['data']['ring_current'])
+
+        if not ring_currents:
+            if current == 'mean':
+                ring_current = np.mean(d['data']['ring_current'])
+            else:
+                if current == 'peak':
+                    idx = d['data'][y_label].argmax()
+                elif current == 'first':
+                    idx = 0
+                elif current == 'last':
+                    idx = -1
+                ring_current = list(d['data']['ring_current'])[idx]
         else:
-            if current == 'peak':
-                idx = d['data']['VFMcamroi1'].argmax()
-            elif current == 'first':
-                idx = 0
-            elif current == 'last':
-                idx = -1
-            ring_current = list(d['data']['ring_current'])[idx]
+            current = 'manual'
+            ring_current = ring_currents[i]
+
         fwhm_vs_current[i, 0] = ring_current
         fwhm_vs_current[i, 1] = fwhm
 
@@ -49,11 +52,17 @@ def smi_fwhm_vs_current(reverse=False, current='mean', show=True):
         header='ring_current    fwhm'
     )
 
+    units = 'eV' if convert_to_energy else 'deg'
+
     # Plotting:
     plt.figure(figsize=(16, 10))
     plt.grid()
+    title = beamline
+    if harmonic:
+        title = '{}: {}'.format(beamline, harmonic)
+    plt.title(title)
     plt.xlabel('Ring current [mA] (current={})'.format(current))
-    plt.ylabel('FWHM [deg]')
+    plt.ylabel('FWHM [{}]'.format(units))
     if reverse:
         plt.xlim(fwhm_vs_current[0, 0], fwhm_vs_current[-1, 0])
     plt.scatter(fwhm_vs_current[:, 0], fwhm_vs_current[:, 1], s=200)
@@ -66,6 +75,49 @@ def smi_fwhm_vs_current(reverse=False, current='mean', show=True):
 
 
 if __name__ == '__main__':
+    # beamline = 'SMI'
+    beamline = 'CHX'
+
+    allowed_beamlines = ('SMI', 'CHX')
+    if beamline not in allowed_beamlines:
+        raise ValueError('Beamline "{}" is not allowed. Allowed beamlines: {}'.format(beamline, allowed_beamlines))
+
+    first = None
+    last = None
+    exclude = None
+
+    if beamline == 'SMI':
+        x_label = 'dcm_bragg'
+        y_label = 'VFMcamroi1'
+
+        # SMI measurements on 04/04/2017:
+        first = 418
+        last = 657
+        exclude = [529] + list(range(565, 584))
+        scans_list = None
+        ring_currents = None
+        harmonic = None
+    else:  # beamline == 'CHX':
+        x_label = 'dcm_b'
+        y_label = 'xray_eye1_stats1_total'
+
+        # CHX measurements on 03/18/2017:
+        harmonic = '7th harmonic'
+        scans_list = [19041, 19042, 19045, 19046, 19049, 19050, 19053, 19054, 19057]
+        ring_currents = [4.84167, 9.44619, 15.18044, 20.93994, 23.91838, 30.37130, 32.92343, 39.49573, 48.11848]
+
+        # harmonic = '11th harmonic'
+        # scans_list = [19040, 19043, 19044, 19047, 19048, 19051, 19052, 19055, 19056]
+        # ring_currents = [5.04095, 8.93891, 17.08810, 19.20807, 25.97480, 26.80035, 36.00833, 35.39244, 52.94804]
+
+    if not scans_list:
+        scans = []
+        for i in range(first, last + 1):
+            if not i in exclude:
+                scans.append(i)
+    else:
+        scans = scans_list
+
     reverse = False
 
     # current = 'mean'
@@ -74,8 +126,23 @@ if __name__ == '__main__':
     # current = 'last'
 
     show = True
+    # convert_to_energy = True
+    convert_to_energy = False
+    material = 'Si111cryo'
 
     # for current in ('mean', 'peak', 'first', 'last'):
     #     smi_fwhm_vs_current(reverse=reverse, current=current, show=show)
 
-    smi_fwhm_vs_current(reverse=reverse, current=current, show=show)
+    fwhm_vs_current(
+        scans,
+        reverse=reverse,
+        current=current,
+        show=show,
+        convert_to_energy=convert_to_energy,
+        material=material,
+        beamline=beamline,
+        x_label=x_label,
+        y_label=y_label,
+        ring_currents=ring_currents,
+        harmonic=harmonic
+    )
