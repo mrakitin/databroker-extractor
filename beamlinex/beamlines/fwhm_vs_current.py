@@ -75,8 +75,8 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
 
 
 if __name__ == '__main__':
-    # beamline = 'SMI'
-    beamline = 'CHX'
+    beamline = 'SMI'
+    # beamline = 'CHX'
 
     allowed_beamlines = ('SMI', 'CHX')
     if beamline not in allowed_beamlines:
@@ -87,16 +87,34 @@ if __name__ == '__main__':
     exclude = None
 
     if beamline == 'SMI':
-        x_label = 'dcm_bragg'
+        # x_label = 'dcm_bragg'
+        x_label = 'bragg'
         y_label = 'VFMcamroi1'
 
-        # SMI measurements on 04/04/2017:
-        first = 418
-        last = 657
-        exclude = [529] + list(range(565, 584))
-        scans_list = None
-        ring_currents = None
-        harmonic = None
+        # SMI measurements on 03/18/2017:
+        # harmonic = '7th harmonic'
+        # scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
+        #               381]
+        # ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
+        #                  48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
+
+        # harmonic = '17th harmonic'
+        # scans_list = [339, 342, 346, 349, 350, 352, 356, 360, 366, 370, 372, 373]
+        # ring_currents = [4.5, 9.3, 16.504, 15.229, 14.974, 20.976, 24.866, 30.532, 34.113, 37.123, 35.491, 53.225]
+
+        harmonic = '18th harmonic'
+        scans_list = [340, 341, 347, 348, 351, 357, 358, 359, 363, 365, 371, 374]
+        ring_currents = [4.4, 9.4, 16.182, 15.732, 21.324, 24.279, 23.767, 31.044, 27.468, 34.721, 36.153, 50.816]
+
+
+        # # SMI measurements on 04/04/2017:
+        # first = 418
+        # last = 657
+        # exclude = [529] + list(range(565, 584))
+        # scans_list = None
+        # ring_currents = None
+        # harmonic = None
+
     else:  # beamline == 'CHX':
         x_label = 'dcm_b'
         y_label = 'xray_eye1_stats1_total'
@@ -126,8 +144,8 @@ if __name__ == '__main__':
     # current = 'last'
 
     show = True
-    # convert_to_energy = True
-    convert_to_energy = False
+    # convert_to_energy = False
+    convert_to_energy = True
     material = 'Si111cryo'
 
     # for current in ('mean', 'peak', 'first', 'last'):
