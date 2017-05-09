@@ -1,8 +1,9 @@
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 
 from beamlinex.common.databroker import read_single_scan
-from beamlinex.common.io import save_data_numpy
+from beamlinex.common.io import save_data_pandas
 from beamlinex.common.plot import clear_plt
 
 
@@ -14,7 +15,8 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
 
     print('Scans list:\n{}'.format(scans))
 
-    fwhm_vs_current = np.zeros((len(scans), 2))
+    data = []
+    columns = ['ring_current', 'fwhm', 'timestamp']
     fname = '{}_fwhm_vs_current_{}_to_{}'.format(beamline.lower(), scans[0], scans[-1])
     for i, s in enumerate(scans):
         print('s={}'.format(s))
@@ -42,15 +44,14 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
             current = 'manual'
             ring_current = ring_currents[i]
 
-        fwhm_vs_current[i, 0] = ring_current
-        fwhm_vs_current[i, 1] = fwhm
+        data.append([ring_current, fwhm, np.array(d['data']['time'])[i]])
+
+    # Convert data to pandas dataframe:
+    data = pd.DataFrame(data, columns=columns)
 
     # Save data:
-    save_data_numpy(
-        data=fwhm_vs_current,
-        name='{}.dat'.format(fname),
-        header='ring_current    fwhm'
-    )
+    file_name = '{}.dat'.format(fname)
+    save_data_pandas(file_name, data, columns, index=True, justify='right')
 
     units = 'eV' if convert_to_energy else 'deg'
 
@@ -64,8 +65,8 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     plt.xlabel('Ring current [mA] (current={})'.format(current))
     plt.ylabel('FWHM [{}]'.format(units))
     if reverse:
-        plt.xlim(fwhm_vs_current[0, 0], fwhm_vs_current[-1, 0])
-    plt.scatter(fwhm_vs_current[:, 0], fwhm_vs_current[:, 1], s=200)
+        plt.xlim(data['ring_current'][0], data['ring_current'][-1])
+    plt.scatter(data['ring_current'], data['fwhm'], s=200)
     plt.tight_layout()
     plt.savefig('{}_current={}.png'.format(fname, current))
     if show:
@@ -92,19 +93,19 @@ if __name__ == '__main__':
         y_label = 'VFMcamroi1'
 
         # SMI measurements on 03/18/2017:
-        # harmonic = '7th harmonic'
-        # scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
-        #               381]
-        # ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
-        #                  48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
+        harmonic = '7th harmonic'
+        scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
+                      381]
+        ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
+                         48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
 
         # harmonic = '17th harmonic'
         # scans_list = [339, 342, 346, 349, 350, 352, 356, 360, 366, 370, 372, 373]
         # ring_currents = [4.5, 9.3, 16.504, 15.229, 14.974, 20.976, 24.866, 30.532, 34.113, 37.123, 35.491, 53.225]
 
-        harmonic = '18th harmonic'
-        scans_list = [340, 341, 347, 348, 351, 357, 358, 359, 363, 365, 371, 374]
-        ring_currents = [4.4, 9.4, 16.182, 15.732, 21.324, 24.279, 23.767, 31.044, 27.468, 34.721, 36.153, 50.816]
+        # harmonic = '18th harmonic'
+        # scans_list = [340, 341, 347, 348, 351, 357, 358, 359, 363, 365, 371, 374]
+        # ring_currents = [4.4, 9.4, 16.182, 15.732, 21.324, 24.279, 23.767, 31.044, 27.468, 34.721, 36.153, 50.816]
 
 
         # # SMI measurements on 04/04/2017:
