@@ -3,12 +3,14 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from beamlinex.common.databroker import read_single_scan
+from beamlinex.common.fit_data import fit_data, plot_data
 from beamlinex.common.io import save_data_pandas
 from beamlinex.common.plot import clear_plt
 
 
 def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_energy=False, material=None,
-                    x_label='dcm_bragg', y_label='VFMcamroi1', beamline='SMI', ring_currents=None, harmonic=None):
+                    x_label='dcm_bragg', y_label='VFMcamroi1', beamline='SMI', ring_currents=None, harmonic=None,
+                    mode=None, num_bunches=None, **kwargs):
     allowed_current_values = ('mean', 'peak', 'first', 'last')
     if current not in allowed_current_values:
         raise ValueError('{}: not allowed. Allowed values: {}'.format(current, allowed_current_values))
@@ -16,7 +18,9 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     print('Scans list:\n{}'.format(scans))
 
     data = []
-    columns = ['ring_current', 'fwhm', 'timestamp']
+    columns = ['timestamp', 'current_per_bunch', 'fwhm']
+    if mode:
+        columns.append('espread')
     fname = '{}_fwhm_vs_current_{}_to_{}'.format(beamline.lower(), scans[0], scans[-1])
     for i, s in enumerate(scans):
         print('s={}'.format(s))
@@ -28,6 +32,7 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
             material=material
         )
         fwhm = d['fwhm']
+        espread = fwhm2espread(fwhm, mode=mode, **kwargs) if mode else None
 
         if not ring_currents:
             if current == 'mean':
@@ -44,7 +49,9 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
             current = 'manual'
             ring_current = ring_currents[i]
 
-        data.append([ring_current, fwhm, np.array(d['data']['time'])[i]])
+        data.append([np.array(d['data']['time'])[i], ring_current / float(num_bunches), fwhm])
+        if espread:
+            data[-1].append(espread)
 
     # Convert data to pandas dataframe:
     data = pd.DataFrame(data, columns=columns)
@@ -53,7 +60,10 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     file_name = '{}.dat'.format(fname)
     save_data_pandas(file_name, data, columns, index=True, justify='right')
 
-    units = 'eV' if convert_to_energy else 'deg'
+    if convert_to_energy:
+        units = 'eV' if not mode else ''
+    else:
+        units = 'deg'
 
     # Plotting:
     plt.figure(figsize=(16, 10))
@@ -62,20 +72,29 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     if harmonic:
         title = '{}: {}'.format(beamline, harmonic)
     plt.title(title)
-    plt.xlabel('Ring current [mA] (current={})'.format(current))
-    plt.ylabel('FWHM [{}]'.format(units))
-    if reverse:
-        plt.xlim(data['ring_current'][0], data['ring_current'][-1])
-    plt.scatter(data['ring_current'], data['fwhm'], s=200)
+    if not mode:
+        plt.xlabel('Ring current [mA] (current={})'.format(current))
+        plt.ylabel('FWHM [{}]'.format(units))
+        if reverse:
+            plt.xlim(data['current_per_bunch'][0], data['current_per_bunch'][-1])
+        plt.scatter(data['current_per_bunch'], data['fwhm'], s=200)
+    else:
+        plt.xlabel('Ring current per bunch [mA]')
+        plt.ylabel(r'Energy spread, $10^{-3}$')
+        plt.scatter(data['current_per_bunch'], data['espread'], s=100)
+        plt.ylim(
+            (data['espread'].min() - np.abs(data['espread'].min()) * 0.01),
+            (data['espread'].max() + np.abs(data['espread'].max()) * 0.01)
+        )
     plt.tight_layout()
-    plt.savefig('{}_current={}.png'.format(fname, current))
+    plt.savefig('{}.png'.format(fname))
     if show:
         plt.show()
     clear_plt()
     print('')
 
 
-if __name__ == '__main__':
+def main(**kwargs):
     beamline = 'SMI'
     # beamline = 'CHX'
 
@@ -87,6 +106,8 @@ if __name__ == '__main__':
     last = None
     exclude = None
 
+    mode = None
+
     if beamline == 'SMI':
         # x_label = 'dcm_bragg'
         x_label = 'bragg'
@@ -94,6 +115,7 @@ if __name__ == '__main__':
 
         # SMI measurements on 03/18/2017:
         harmonic = '7th harmonic'
+        mode = 'reg'
         scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
                       381]
         ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
@@ -109,12 +131,13 @@ if __name__ == '__main__':
 
 
         # # SMI measurements on 04/04/2017:
+        # x_label = 'dcm_bragg'
+        # mode = 'bare'
         # first = 418
         # last = 657
         # exclude = [529] + list(range(565, 584))
         # scans_list = None
         # ring_currents = None
-        # harmonic = None
 
     else:  # beamline == 'CHX':
         x_label = 'dcm_b'
@@ -163,5 +186,54 @@ if __name__ == '__main__':
         x_label=x_label,
         y_label=y_label,
         ring_currents=ring_currents,
-        harmonic=harmonic
+        harmonic=harmonic,
+        mode=mode,
+        **kwargs
     )
+
+
+def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
+    allowed_modes = ('reg', 'bare')
+    assert mode in allowed_modes, '{}: not allowed. Allowed values: {}'.format(mode, allowed_modes)
+
+    # Values from beamlinex/common/fit_data.py (a, b and c coefficients of the quadratic equation):
+    a, b, c = fitting_coefs
+    espread = a * fwhm ** 2 + b * fwhm + c
+    assert espread > 0, '{}: energy spread is negative'.format(espread)
+    return espread
+
+
+if __name__ == '__main__':
+    num_bunches = 15
+
+    # Reg. lattice:
+    lattice = 'reg. lattice'
+    data = np.array([
+        [24.86341, 0.5],
+        [32.38799, 0.7],
+        [40.08822, 0.9],
+        [47.82172, 1.1],
+        [55.57577, 1.3],
+        [63.32070, 1.5],
+    ])
+
+    # Bare lattice:
+    # lattice = 'bare lattice'
+    # data = np.array([
+    #     [25.82380, 0.5],
+    #     [33.27350, 0.7],
+    #     [40.81769, 0.9],
+    #     [48.37857, 1.1],
+    #     [56.11366, 1.3],
+    #     [63.76351, 1.5],
+    # ])
+
+    x, y, xx2, yy2, fitting_coefs = fit_data(data)
+    x_label = 'FWHM ({}) [eV]'.format(lattice)
+    y_label = r'Energy spread, 10$^{-3}$'
+    title = 'Energy spread vs. FWHM ({})'.format(lattice)
+    file_name = '{}.png'.format(title.replace(' ', '_'))
+
+    plot_data(x, y, xx2, yy2, fitting_coefs, x_label, y_label, title=title, file_name=file_name)
+
+    main(fitting_coefs=fitting_coefs, num_bunches=num_bunches)

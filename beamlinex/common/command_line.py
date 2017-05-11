@@ -93,8 +93,8 @@ def parse_studies():
     parser = argparse.ArgumentParser(description='Select a study to fit by parabola')
     parser.add_argument('-b', '--beamline', dest='beamline', default=None, choices=('chx', 'CHX', 'smi', 'SMI'),
                         help='select beamline to get data from')
-    parser.add_argument('-s', '--study', dest='study', default=None, choices=('elevation', 'taper'),
-                        help='study name')
+    parser.add_argument('-s', '--study', dest='study', default=None, choices=('elevation', 'taper', 'simulations_reg',
+                                                                              'simulations_bare'), help='study name')
     parser.add_argument('-n', '--no-save', dest='no_save', default=None, action='store_true',
                         help='do not save files')
     args = parser.parse_args()
