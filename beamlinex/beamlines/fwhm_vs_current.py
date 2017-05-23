@@ -95,8 +95,8 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
 
 
 def main(**kwargs):
-    beamline = 'SMI'
-    # beamline = 'CHX'
+    # beamline = 'SMI'
+    beamline = 'CHX'
 
     allowed_beamlines = ('SMI', 'CHX')
     if beamline not in allowed_beamlines:
@@ -145,6 +145,8 @@ def main(**kwargs):
 
         # CHX measurements on 03/18/2017:
         harmonic = '7th harmonic'
+        mode = 'reg'
+
         scans_list = [19041, 19042, 19045, 19046, 19049, 19050, 19053, 19054, 19057]
         ring_currents = [4.84167, 9.44619, 15.18044, 20.93994, 23.91838, 30.37130, 32.92343, 39.49573, 48.11848]
 
@@ -206,16 +208,17 @@ def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
 if __name__ == '__main__':
     num_bunches = 15
 
+    # ***** SMI beamline *****
     # Reg. lattice:
-    lattice = 'reg. lattice'
-    data = np.array([
-        [24.86341, 0.5],
-        [32.38799, 0.7],
-        [40.08822, 0.9],
-        [47.82172, 1.1],
-        [55.57577, 1.3],
-        [63.32070, 1.5],
-    ])
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [24.86341, 0.5],
+    #     [32.38799, 0.7],
+    #     [40.08822, 0.9],
+    #     [47.82172, 1.1],
+    #     [55.57577, 1.3],
+    #     [63.32070, 1.5],
+    # ])
 
     # Bare lattice:
     # lattice = 'bare lattice'
@@ -228,6 +231,40 @@ if __name__ == '__main__':
     #     [63.76351, 1.5],
     # ])
 
+    # ***** CHX beamline *****
+    # Reg. lattice:
+    # # 30 pm:
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [28.06296, 0.5],
+    #     [36.93890, 0.7],
+    #     [45.87224, 0.9],
+    #     [54.82642, 1.1],
+    #     [63.70152, 1.3],
+    #     [72.50611, 1.5],
+    # ])
+
+    # # 8 pm:
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [27.75656, 0.5],
+    #     [36.55657, 0.7],
+    #     [45.49892, 0.9],
+    #     [54.51722, 1.1],
+    #     [63.36324, 1.3],
+    #     [71.86605, 1.5],
+    # ])
+
+    # 50 pm:
+    lattice = 'reg. lattice'
+    data = np.array([
+        [28.42622, 0.5],
+        [37.03953, 0.7],
+        [45.71785, 0.9],
+        [54.71145, 1.1],
+        [63.41970, 1.3],
+        [72.06842, 1.5],
+    ])
     x, y, xx2, yy2, fitting_coefs = fit_data(data)
     x_label = 'FWHM ({}) [eV]'.format(lattice)
     y_label = r'Energy spread, 10$^{-3}$'
