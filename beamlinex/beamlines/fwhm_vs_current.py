@@ -94,10 +94,7 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     print('')
 
 
-def main(**kwargs):
-    # beamline = 'SMI'
-    beamline = 'CHX'
-
+def main(beamline, **kwargs):
     allowed_beamlines = ('SMI', 'CHX')
     if beamline not in allowed_beamlines:
         raise ValueError('Beamline "{}" is not allowed. Allowed beamlines: {}'.format(beamline, allowed_beamlines))
@@ -115,11 +112,11 @@ def main(**kwargs):
 
         # SMI measurements on 03/18/2017:
         harmonic = '7th harmonic'
-        mode = 'reg'
-        scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
-                      381]
-        ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
-                         48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
+        # mode = 'reg'
+        # scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
+        #               381]
+        # ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
+        #                  48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
 
         # harmonic = '17th harmonic'
         # scans_list = [339, 342, 346, 349, 350, 352, 356, 360, 366, 370, 372, 373]
@@ -131,13 +128,13 @@ def main(**kwargs):
 
 
         # # SMI measurements on 04/04/2017:
-        # x_label = 'dcm_bragg'
-        # mode = 'bare'
-        # first = 418
-        # last = 657
-        # exclude = [529] + list(range(565, 584))
-        # scans_list = None
-        # ring_currents = None
+        x_label = 'dcm_bragg'
+        mode = 'bare'
+        first = 418
+        last = 657
+        exclude = [529] + list(range(565, 584))
+        scans_list = None
+        ring_currents = None
 
     else:  # beamline == 'CHX':
         x_label = 'dcm_b'
@@ -208,8 +205,13 @@ def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
 if __name__ == '__main__':
     num_bunches = 15
 
+    beamline = 'SMI'
+    # beamline = 'CHX'
+
     # ***** SMI beamline *****
     # Reg. lattice:
+
+    # 30 pm:
     # lattice = 'reg. lattice'
     # data = np.array([
     #     [24.86341, 0.5],
@@ -220,51 +222,77 @@ if __name__ == '__main__':
     #     [63.32070, 1.5],
     # ])
 
+    # 50 pm:
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [25.38570, 0.5],
+    #     [32.85911, 0.7],
+    #     [40.44787, 0.9],
+    #     [48.04519, 1.1],
+    #     [55.66512, 1.3],
+    #     [63.30655, 1.5],
+    # ])
+
     # Bare lattice:
+
+    # 30 pm:
+    lattice = 'bare lattice'
+    data = np.array([
+        [25.82380, 0.5],
+        [33.27350, 0.7],
+        [40.81769, 0.9],
+        [48.37857, 1.1],
+        [56.11366, 1.3],
+        [63.76351, 1.5],
+    ])
+
+    # 50 pm:
     # lattice = 'bare lattice'
     # data = np.array([
-    #     [25.82380, 0.5],
-    #     [33.27350, 0.7],
-    #     [40.81769, 0.9],
-    #     [48.37857, 1.1],
-    #     [56.11366, 1.3],
-    #     [63.76351, 1.5],
+    #     [26.39193, 0.5],
+    #     [33.82944, 0.7],
+    #     [41.35603, 0.9],
+    #     [48.88257, 1.1],
+    #     [56.48959, 1.3],
+    #     [64.17464, 1.5],
     # ])
 
     # ***** CHX beamline *****
     # Reg. lattice:
-    # # 30 pm:
-    # lattice = 'reg. lattice'
-    # data = np.array([
-    #     [28.06296, 0.5],
-    #     [36.93890, 0.7],
-    #     [45.87224, 0.9],
-    #     [54.82642, 1.1],
-    #     [63.70152, 1.3],
-    #     [72.50611, 1.5],
-    # ])
 
     # # 8 pm:
     # lattice = 'reg. lattice'
     # data = np.array([
-    #     [27.75656, 0.5],
-    #     [36.55657, 0.7],
-    #     [45.49892, 0.9],
-    #     [54.51722, 1.1],
-    #     [63.36324, 1.3],
-    #     [71.86605, 1.5],
+    #     [31.02236, 0.5],
+    #     [39.89320, 0.7],
+    #     [48.48306, 0.9],
+    #     [57.11007, 1.1],
+    #     [65.88523, 1.3],
+    #     [74.56814, 1.5],
+    # ])
+
+    # # 30 pm:
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [32.64499, 0.5],
+    #     [41.18504, 0.7],
+    #     [49.70517, 0.9],
+    #     [58.26634, 1.1],
+    #     [66.89718, 1.3],
+    #     [75.41395, 1.5],
     # ])
 
     # 50 pm:
-    lattice = 'reg. lattice'
-    data = np.array([
-        [28.42622, 0.5],
-        [37.03953, 0.7],
-        [45.71785, 0.9],
-        [54.71145, 1.1],
-        [63.41970, 1.3],
-        [72.06842, 1.5],
-    ])
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [34.40034, 0.5],
+    #     [42.79506, 0.7],
+    #     [51.43338, 0.9],
+    #     [60.01948, 1.1],
+    #     [68.23102, 1.3],
+    #     [76.63646, 1.5],
+    # ])
+
     x, y, xx2, yy2, fitting_coefs = fit_data(data)
     x_label = 'FWHM ({}) [eV]'.format(lattice)
     y_label = r'Energy spread, 10$^{-3}$'
@@ -273,4 +301,4 @@ if __name__ == '__main__':
 
     plot_data(x, y, xx2, yy2, fitting_coefs, x_label, y_label, title=title, file_name=file_name)
 
-    main(fitting_coefs=fitting_coefs, num_bunches=num_bunches)
+    main(beamline=beamline, fitting_coefs=fitting_coefs, num_bunches=num_bunches)
