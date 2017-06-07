@@ -80,12 +80,10 @@ def parse_range_ids(range_str):
 
 
 def parse_scan_ids(scans_list):
-    scan_ids = []
-    for s in scans_list:
-        try:
-            scan_ids.append(int(s))  # for scan_id
-        except:
-            scan_ids.append(str(s))  # for UIDs
+    try:
+        scan_ids = [int(x) for x in scans_list]  # for scan_id's
+    except:
+        scan_ids = [str(x) for x in scans_list]  # for UID's
     if not scan_ids:
         scan_ids = [-1]
     return scan_ids

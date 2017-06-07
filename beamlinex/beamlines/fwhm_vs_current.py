@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
+from beamlinex.common.command_line import read_config
 from beamlinex.common.databroker import read_single_scan
 from beamlinex.common.fit_data import fit_data, plot_data
 from beamlinex.common.io import save_data_pandas
@@ -95,7 +96,7 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
 
 
 def main(beamline, **kwargs):
-    allowed_beamlines = ('SMI', 'CHX')
+    allowed_beamlines = read_config()
     if beamline not in allowed_beamlines:
         raise ValueError('Beamline "{}" is not allowed. Allowed beamlines: {}'.format(beamline, allowed_beamlines))
 
@@ -105,7 +106,7 @@ def main(beamline, **kwargs):
 
     mode = None
 
-    if beamline == 'SMI':
+    if beamline.upper() == 'SMI':
         # x_label = 'dcm_bragg'
         x_label = 'bragg'
         y_label = 'VFMcamroi1'
@@ -136,7 +137,7 @@ def main(beamline, **kwargs):
         scans_list = None
         ring_currents = None
 
-    else:  # beamline == 'CHX':
+    elif beamline.upper() == 'CHX':
         x_label = 'dcm_b'
         y_label = 'xray_eye1_stats1_total'
 
@@ -150,6 +151,17 @@ def main(beamline, **kwargs):
         # harmonic = '11th harmonic'
         # scans_list = [19040, 19043, 19044, 19047, 19048, 19051, 19052, 19055, 19056]
         # ring_currents = [5.04095, 8.93891, 17.08810, 19.20807, 25.97480, 26.80035, 36.00833, 35.39244, 52.94804]
+    elif beamline.upper() == 'SRX':
+        # SRX measurements on 06/12/2016:
+        x_label = 'energy_bragg'
+        y_label = 'bpmAD_stats3_total'
+        harmonic = '5th harmonic'
+        mode = None
+
+        # scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d', 'c727d916']  # bare lattice
+        scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
+                      '295f3c57', 'ab5af66b']  # 1DW
+        ring_currents = None
 
     if not scans_list:
         scans = []
@@ -205,8 +217,9 @@ def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
 if __name__ == '__main__':
     num_bunches = 15
 
-    beamline = 'SMI'
+    # beamline = 'SMI'
     # beamline = 'CHX'
+    beamline = 'SRX'
 
     # ***** SMI beamline *****
     # Reg. lattice:
@@ -236,7 +249,8 @@ if __name__ == '__main__':
     # Bare lattice:
 
     # 30 pm:
-    lattice = 'bare lattice'
+    # lattice = 'bare lattice'
+    lattice = '1DW'
     data = np.array([
         [25.82380, 0.5],
         [33.27350, 0.7],
