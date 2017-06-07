@@ -37,6 +37,11 @@ def parse_command_line():
     parser.add_argument('--scatter-size', dest='scatter_size', default=None, help='scatter size')
     parser.add_argument('-e', '--convert-to-energy', dest='convert_to_energy', action='store_true',
                         help='convert to energy from Bragg diffraction angle')
+    parser.add_argument('-m,', '--material', dest='material', default='Si111cryo', help='material of the DCM')
+    parser.add_argument('--delta-bragg', dest='delta_bragg', default=None,
+                        help='offset for conversion from DCM Bragg angle to photon energy')
+    parser.add_argument('--d-spacing', dest='d_spacing', default=None,
+                        help='an arbitrary d-spacing of the crystal of the DCM [A]')
 
     # Save data:
     parser.add_argument('-s', '--save-ids', dest='save_ids', default=None, nargs='*',

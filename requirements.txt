@@ -9,4 +9,4 @@ tifffile
 git+https://github.com/NSLS-II/databroker#egg=databroker
 git+https://github.com/NSLS-II/metadatastore#egg=metadatastore
 git+https://github.com/NSLS-II/filestore#egg=filestore
-git+https://github.com/NSLS-II-CHX/chxtools#egg=chxtools
+git+https://github.com/mrakitin/chxtools#egg=chxtools

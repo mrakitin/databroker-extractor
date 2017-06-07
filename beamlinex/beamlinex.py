@@ -24,6 +24,9 @@ def beamlinex_cli():
         'x_units': x_units,
         'y_units': y_units,
         'convert_to_energy': args.convert_to_energy,
+        'material': args.material,
+        'delta_bragg': args.delta_bragg,
+        'd_spacing': args.d_spacing,
     }
     if args.scatter_size:
         plot_kwargs['scatter_size'] = args.scatter_size

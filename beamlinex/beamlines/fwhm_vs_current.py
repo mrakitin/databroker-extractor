@@ -11,7 +11,7 @@ from beamlinex.common.plot import clear_plt
 
 def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_energy=False, material=None,
                     x_label='dcm_bragg', y_label='VFMcamroi1', beamline='SMI', ring_currents=None, harmonic=None,
-                    mode=None, num_bunches=None, **kwargs):
+                    mode=None, num_bunches=None, delta_bragg=None, d_spacing=None, **kwargs):
     allowed_current_values = ('mean', 'peak', 'first', 'last')
     if current not in allowed_current_values:
         raise ValueError('{}: not allowed. Allowed values: {}'.format(current, allowed_current_values))
@@ -30,7 +30,9 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
             x_label=x_label,
             y_label=y_label,
             convert_to_energy=convert_to_energy,
-            material=material
+            material=material,
+            delta_bragg=delta_bragg,
+            d_spacing=d_spacing
         )
         fwhm = d['fwhm']
         espread = fwhm2espread(fwhm, mode=mode, **kwargs) if mode else None
@@ -106,6 +108,13 @@ def main(beamline, **kwargs):
 
     mode = None
 
+    show = True
+    # convert_to_energy = False
+    convert_to_energy = True
+    material = 'Si111cryo'
+    delta_bragg = None
+    d_spacing = None
+
     if beamline.upper() == 'SMI':
         # x_label = 'dcm_bragg'
         x_label = 'bragg'
@@ -158,9 +167,16 @@ def main(beamline, **kwargs):
         harmonic = '5th harmonic'
         mode = None
 
-        # scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d', 'c727d916']  # bare lattice
-        scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
-                      '295f3c57', 'ab5af66b']  # 1DW
+        material = ''
+        # From https://github.com/NSLS-II-SRX/ipython_ophyd/blob/4716da5d6570f51f0f5b882b627ed57c39c19d34/profile_xf05id1/startup/10-machine.py#L436:
+        # cal_data_2016cycle1_2 (2016/1/27 (Se, Cu, Fe, Ti)):
+        delta_bragg = 0.315532509387
+        d_spacing = 3.12924894907
+
+        scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
+                      'c727d916']  # bare lattice
+        # scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
+        #               '295f3c57', 'ab5af66b']  # 1DW
         ring_currents = None
 
     if not scans_list:
@@ -178,11 +194,6 @@ def main(beamline, **kwargs):
     # current = 'first'
     # current = 'last'
 
-    show = True
-    # convert_to_energy = False
-    convert_to_energy = True
-    material = 'Si111cryo'
-
     # for current in ('mean', 'peak', 'first', 'last'):
     #     smi_fwhm_vs_current(reverse=reverse, current=current, show=show)
 
@@ -199,6 +210,8 @@ def main(beamline, **kwargs):
         ring_currents=ring_currents,
         harmonic=harmonic,
         mode=mode,
+        delta_bragg=delta_bragg,
+        d_spacing=d_spacing,
         **kwargs
     )
 
@@ -249,8 +262,8 @@ if __name__ == '__main__':
     # Bare lattice:
 
     # 30 pm:
-    # lattice = 'bare lattice'
-    lattice = '1DW'
+    lattice = 'bare lattice'
+    # lattice = '1DW'
     data = np.array([
         [25.82380, 0.5],
         [33.27350, 0.7],
