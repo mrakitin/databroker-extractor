@@ -18,5 +18,15 @@
             "y_label": "VFMcamroi1",
             "y_units": "arb. units"
         }
+    },
+    "SRX": {
+        "full_name": "Submicron Resolution X-ray Spectroscopy (SRX)",
+        "port": "5-ID",
+        "default_labels": {
+            "x_label": "energy_bragg",
+            "x_units": "degrees",
+            "y_label": "bpmAD_stats1_total",
+            "y_units": "arb. units"
+        }
     }
 }

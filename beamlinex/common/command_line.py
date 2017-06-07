@@ -22,7 +22,7 @@ def parse_command_line():
     parser = argparse.ArgumentParser(description='Accessing and visualizing data from NSLS-II beamlines')
 
     # Select a beamline:
-    parser.add_argument('-b', '--beamline', dest='beamline', default=None, choices=('chx', 'CHX', 'smi', 'SMI'),
+    parser.add_argument('-b', '--beamline', dest='beamline', default=None, choices=read_config(),
                         help='select beamline to get data from')
 
     # Plot data:
@@ -80,10 +80,12 @@ def parse_range_ids(range_str):
 
 
 def parse_scan_ids(scans_list):
-    try:
-        scan_ids = [int(x) for x in scans_list]
-    except:
-        raise ValueError('Incorrect scan ids provided: {}'.format(scans_list))
+    scan_ids = []
+    for s in scans_list:
+        try:
+            scan_ids.append(int(s))  # for scan_id
+        except:
+            scan_ids.append(str(s))  # for UIDs
     if not scan_ids:
         scan_ids = [-1]
     return scan_ids
@@ -91,7 +93,7 @@ def parse_scan_ids(scans_list):
 
 def parse_studies():
     parser = argparse.ArgumentParser(description='Select a study to fit by parabola')
-    parser.add_argument('-b', '--beamline', dest='beamline', default=None, choices=('chx', 'CHX', 'smi', 'SMI'),
+    parser.add_argument('-b', '--beamline', dest='beamline', default=None, choices=read_config(),
                         help='select beamline to get data from')
     parser.add_argument('-s', '--study', dest='study', default=None, choices=('elevation', 'taper', 'simulations_reg',
                                                                               'simulations_bare'), help='study name')
@@ -106,7 +108,7 @@ def parse_studies():
     return args
 
 
-def read_config(beamline, config_dir='config', config_file='beamlines.json'):
+def read_config(beamline=None, config_dir='config', config_file='beamlines.json'):
     config_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         config_dir,
@@ -116,4 +118,7 @@ def read_config(beamline, config_dir='config', config_file='beamlines.json'):
         raise ValueError('{}: JSON config file not found'.format(config_path))
     with open(config_path) as f:
         config_dict = json.load(f)
-    return config_dict[beamline.upper()]
+    if beamline:
+        return config_dict[beamline.upper()]
+    else:
+        return [x.lower() for x in config_dict.keys()] + [x.upper() for x in config_dict.keys()]
