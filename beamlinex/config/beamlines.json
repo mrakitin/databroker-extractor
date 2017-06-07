@@ -25,7 +25,7 @@
         "default_labels": {
             "x_label": "energy_bragg",
             "x_units": "degrees",
-            "y_label": "bpmAD_stats1_total",
+            "y_label": "bpmAD_stats3_total",
             "y_units": "arb. units"
         }
     }
