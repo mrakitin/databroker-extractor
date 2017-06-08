@@ -165,7 +165,6 @@ def main(beamline, **kwargs):
         x_label = 'energy_bragg'
         y_label = 'bpmAD_stats3_total'
         harmonic = '5th harmonic'
-        mode = None
 
         material = ''
         # From https://github.com/NSLS-II-SRX/ipython_ophyd/blob/4716da5d6570f51f0f5b882b627ed57c39c19d34/profile_xf05id1/startup/10-machine.py#L436:
@@ -173,10 +172,13 @@ def main(beamline, **kwargs):
         delta_bragg = 0.315532509387
         d_spacing = 3.12924894907
 
-        scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
-                      'c727d916']  # bare lattice
-        # scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
-        #               '295f3c57', 'ab5af66b']  # 1DW
+        # mode = 'bare'
+        # scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
+        #               'c727d916']  # bare lattice
+
+        mode = '1DW'
+        scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
+                      '295f3c57', 'ab5af66b']  # 1DW
         ring_currents = None
 
     if not scans_list:
@@ -217,7 +219,7 @@ def main(beamline, **kwargs):
 
 
 def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
-    allowed_modes = ('reg', 'bare')
+    allowed_modes = ('reg', 'bare', '1DW')
     assert mode in allowed_modes, '{}: not allowed. Allowed values: {}'.format(mode, allowed_modes)
 
     # Values from beamlinex/common/fit_data.py (a, b and c coefficients of the quadratic equation):
@@ -230,12 +232,23 @@ def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
 if __name__ == '__main__':
     num_bunches = 15
 
-    # beamline = 'SMI'
+    beamline = 'SMI'
     # beamline = 'CHX'
-    beamline = 'SRX'
+    # beamline = 'SRX'
 
     # ***** SMI beamline *****
     # Reg. lattice:
+
+    # 8 pm:
+    # lattice = 'reg. lattice'
+    # data = np.array([
+    #     [24.53058, 0.5],
+    #     [32.17943, 0.7],
+    #     [39.96556, 0.9],
+    #     [47.75136, 1.1],
+    #     [55.55569, 1.3],
+    #     [63.38812, 1.5],
+    # ])
 
     # 30 pm:
     # lattice = 'reg. lattice'
@@ -261,17 +274,29 @@ if __name__ == '__main__':
 
     # Bare lattice:
 
-    # 30 pm:
+    # 8 pm:
     lattice = 'bare lattice'
     # lattice = '1DW'
     data = np.array([
-        [25.82380, 0.5],
-        [33.27350, 0.7],
-        [40.81769, 0.9],
-        [48.37857, 1.1],
-        [56.11366, 1.3],
-        [63.76351, 1.5],
+        [25.45005, 0.5],
+        [32.99879, 0.7],
+        [40.66154, 0.9],
+        [48.32708, 1.1],
+        [56.01338, 1.3],
+        [63.73374, 1.5],
     ])
+
+    # 30 pm:
+    # lattice = 'bare lattice'
+    # lattice = '1DW'
+    # data = np.array([
+    #     [38.09703, 0.5],
+    #     [44.11015, 0.7],
+    #     [50.79854, 0.9],
+    #     [57.72489, 1.1],
+    #     [64.68369, 1.3],
+    #     [71.67425, 1.5],
+    # ])
 
     # 50 pm:
     # lattice = 'bare lattice'
