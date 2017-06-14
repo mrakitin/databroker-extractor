@@ -172,13 +172,13 @@ def main(beamline, **kwargs):
         delta_bragg = 0.315532509387
         d_spacing = 3.12924894907
 
-        # mode = 'bare'
-        # scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
-        #               'c727d916']  # bare lattice
+        mode = 'bare'
+        scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
+                      'c727d916']  # bare lattice
 
-        mode = '1DW'
-        scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
-                      '295f3c57', 'ab5af66b']  # 1DW
+        # mode = '1DW'
+        # scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
+        #               '295f3c57', 'ab5af66b']  # 1DW
         ring_currents = None
 
     if not scans_list:
@@ -232,9 +232,9 @@ def fwhm2espread(fwhm, fitting_coefs=None, mode='reg'):
 if __name__ == '__main__':
     num_bunches = 15
 
-    beamline = 'SMI'
+    # beamline = 'SMI'
     # beamline = 'CHX'
-    # beamline = 'SRX'
+    beamline = 'SRX'
 
     # ***** SMI beamline *****
     # Reg. lattice:
@@ -278,12 +278,12 @@ if __name__ == '__main__':
     lattice = 'bare lattice'
     # lattice = '1DW'
     data = np.array([
-        [25.45005, 0.5],
-        [32.99879, 0.7],
-        [40.66154, 0.9],
-        [48.32708, 1.1],
-        [56.01338, 1.3],
-        [63.73374, 1.5],
+        [39.28357, 0.5],
+        [45.43406, 0.7],
+        [52.22852, 0.9],
+        [59.27309, 1.1],
+        [66.35909, 1.3],
+        [73.47602, 1.5],
     ])
 
     # 30 pm:
