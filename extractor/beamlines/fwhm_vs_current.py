@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from beamlinex.common.command_line import read_config
-from beamlinex.common.databroker import read_single_scan
-from beamlinex.common.fit_data import fit_data, plot_data
-from beamlinex.common.io import save_data_pandas
-from beamlinex.common.plot import clear_plt
+from extractor.common.command_line import read_config
+from extractor.common.databroker import read_single_scan
+from extractor.common.fit_data import fit_data, plot_data
+from extractor.common.io import save_data_pandas
+from extractor.common.plot import clear_plt
 
 
 def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_energy=False, material=None,

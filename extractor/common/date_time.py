@@ -4,7 +4,7 @@
 import datetime
 import time
 
-import beamlinex.common.databroker as c_db
+import extractor.common.databroker as c_db
 
 
 def current_timestamp():

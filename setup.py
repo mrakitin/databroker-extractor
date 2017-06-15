@@ -2,23 +2,23 @@
 
 from setuptools import setup, find_packages
 
-# It's not used at the moment since the dependencies cannot be installed by pip from git++http repos:
+# It's not used at the moment since the dependencies cannot be installed by pip from git+http repos:
 with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 # From https://docs.python.org/2/distutils/setupscript.html#installing-package-data:
-package_data = {'beamlinex': ['config/beamlines.json']}
+package_data = {'databroker-extractor': ['config/beamlines.json']}
 
 setup(
-    name='beamlinex',
-    version='20170607.000000',
-    description='BeamlineX - tools and utilities for experiments',
+    name='databroker-extractor',
+    version='20170615.000000',
+    description='databroker-extractor - tools and utilities for experiments',
     author='Maksim Rakitin',
-    url='https://github.com/mrakitin/experiments',
+    url='https://github.com/mrakitin/databroker-extractor',
     packages=find_packages(),
     package_data=package_data,
     install_requires=None,
     entry_points={
-        "console_scripts": ['beamlinex = beamlinex.beamlinex:beamlinex_cli']
+        "console_scripts": ['databroker-extractor = extractor.extractor:extractor_cli']
     },
 )

@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import beamlinex.common.command_line as cl
-import beamlinex.common.io as c_io
-import beamlinex.common.plot as c_plot
+import extractor.common.command_line as cl
+import extractor.common.io as c_io
+import extractor.common.plot as c_plot
 
 
-def beamlinex_cli():
+def extractor_cli():
     args, save_files = cl.parse_command_line()
 
     config_dict = cl.read_config(beamline=args.beamline)
@@ -55,4 +55,4 @@ def beamlinex_cli():
 
 
 if __name__ == '__main__':
-    beamlinex_cli()
+    extractor_cli()

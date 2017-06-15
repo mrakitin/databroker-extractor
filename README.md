@@ -53,8 +53,8 @@ ssh -fN -o ExitOnForwardFailure=yes chx-srv1 2>/dev/null && sshfs mrakitin@chx-s
 
 - Run the script to collect data:
 ```bash
-$ beamlinex -b chx -s 19002 19003  # saves data and plots for the scans 19002 and 19003
+$ databroker-extractor -b chx -s 19002 19003  # saves data and plots for the scans 19002 and 19003
 ```
 ```bash
-$ beamlinex -b chx -p 19002 19003  # plots data for the scans 19002 and 19003
+$ databroker-extractor -b chx -p 19002 19003  # plots data for the scans 19002 and 19003
 ```

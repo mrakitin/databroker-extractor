@@ -4,7 +4,7 @@
 import databroker as db
 import numpy as np
 
-import beamlinex.common.math as c_math
+import extractor.common.math as c_math
 import chxtools.xfuncs as xf  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
 
 
