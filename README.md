@@ -1,4 +1,4 @@
-# BeamlineX - tools and utilities for experiments
+# databroker-extractor - tools and utilities for experiments
 
 Used to obtain data from beamline databroker servers and perform initial analysis
 (e.g., calculation of the FWHM of the undulator harmonics).
