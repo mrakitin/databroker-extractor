@@ -7,10 +7,10 @@ Used to obtain data from beamline databroker servers and perform initial analysi
 
 Install miniconda from https://conda.io/miniconda.html. Then create the environment for databroker:
 ```bash
-conda create --name py36 python=3.6 numpy scipy matplotlib
-activate py36
-pip install -r https://raw.githubusercontent.com/mrakitin/experiments/master/requirements.txt
-pip install git+https://github.com/mrakitin/experiments
+conda create --name databroker python=3.6 numpy scipy matplotlib
+activate databroker
+pip install -r https://raw.githubusercontent.com/mrakitin/databroker-extractor/master/requirements.txt
+pip install git+https://github.com/mrakitin/databroker-extractor
 ```
 
 ### Remote access of the data on the CHX beamline of NSLS-II using databroker.
