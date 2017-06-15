@@ -1,4 +1,25 @@
 {
+    "SRX": {
+        "full_name": "Submicron Resolution X-ray Spectroscopy (SRX)",
+        "port": "5-ID",
+        "default_labels": {
+            "x_label": "energy_bragg",
+            "x_units": "degrees",
+            "y_label": "bpmAD_stats3_total",
+            "y_units": "arb. units"
+        },
+        "MDSRO": {
+            "host": "localhost",
+            "port": 27005,
+            "database": "datastore",
+            "timezone": "US/Eastern"
+        },
+        "FSRO": {
+            "host": "localhost",
+            "port": 27005,
+            "database": "filestore"
+        }
+    },
     "CHX": {
         "full_name": "Coherent Hard X-ray Scattering (CHX)",
         "port": "11-ID",
@@ -7,6 +28,17 @@
             "x_units": "degrees",
             "y_label": "elm_sum_all",
             "y_units": "arb. units"
+        },
+        "MDSRO": {
+            "host": "localhost",
+            "port": 27011,
+            "database": "datastore",
+            "timezone": "US/Eastern"
+        },
+        "FSRO": {
+            "host": "localhost",
+            "port": 27011,
+            "database": "filestore"
         }
     },
     "SMI": {
@@ -17,16 +49,17 @@
             "x_units": "degrees",
             "y_label": "VFMcamroi1",
             "y_units": "arb. units"
-        }
-    },
-    "SRX": {
-        "full_name": "Submicron Resolution X-ray Spectroscopy (SRX)",
-        "port": "5-ID",
-        "default_labels": {
-            "x_label": "energy_bragg",
-            "x_units": "degrees",
-            "y_label": "bpmAD_stats3_total",
-            "y_units": "arb. units"
+        },
+        "MDSRO": {
+            "host": "localhost",
+            "port": 27012,
+            "database": "datastore",
+            "timezone": "US/Eastern"
+        },
+        "FSRO": {
+            "host": "localhost",
+            "port": 27012,
+            "database": "filestore"
         }
     }
 }

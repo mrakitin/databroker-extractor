@@ -10,19 +10,20 @@ import extractor.common.date_time as c_dt
 import extractor.common.io as c_io
 
 
-def plot_scans(scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True, scatter_size=10,
+def plot_scans(db, scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True,
+               scatter_size=10,
                figsize=(8, 6), extension='png', convert_to_energy=False, material='Si111cryo', delta_bragg=None,
                d_spacing=None, **kwargs):
     assert len(scan_ids) >= 1, 'The number of scan ids is empty'
-    d = c_db.read_scans(scan_ids=scan_ids, x_label=x_label, y_label=y_label,
+    d = c_db.read_scans(db, scan_ids=scan_ids, x_label=x_label, y_label=y_label,
                         convert_to_energy=convert_to_energy, material=material, delta_bragg=delta_bragg,
                         d_spacing=d_spacing)
 
-    s_first = c_db.scan_info(scan_id=scan_ids[0])
+    s_first = c_db.scan_info(db, scan_id=scan_ids[0])
     if len(scan_ids) == 1:
         str_scan_id = s_first.scan_id
     else:
-        s_last = c_db.scan_info(scan_id=scan_ids[-1])
+        s_last = c_db.scan_info(db, scan_id=scan_ids[-1])
         str_scan_id = '{}-{}'.format(s_first.scan_id, s_last.scan_id)
 
     file_name = c_io.format_filename(

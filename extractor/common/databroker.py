@@ -1,11 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import databroker as db
+import chxtools.xfuncs as xf  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
 import numpy as np
+from databroker import Broker
+from filestore.fs import FileStoreRO as FSRO  # file store read-only
+from metadatastore.mds import MDSRO  # metadata store read-only
 
 import extractor.common.math as c_math
-import chxtools.xfuncs as xf  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
+from extractor.common.command_line import read_config
+
+
+def activate_beamline_db(beamline=None):
+    allowed_beamlines = read_config()
+    if beamline not in allowed_beamlines:
+        raise ValueError('Beamline "{}" is not allowed. Allowed beamlines: {}'.format(beamline, allowed_beamlines))
+    cfg = read_config(beamline=beamline)
+    mds = MDSRO(cfg['MDSRO'])
+    fs = FSRO(cfg['FSRO'])
+    db = Broker(mds, fs)
+    return db
 
 
 def check_columns(data, columns):
@@ -18,16 +32,16 @@ def check_columns(data, columns):
     return True
 
 
-def get_scans_list(keyword):
+def get_scans_list(db, keyword):
     """Get a list of scan filtered by the provided keyword.
 
     :param keyword: a keyword to search scans.
     :return: a list of found scans.
     """
-    return db.db(keyword)
+    return db(keyword)
 
 
-def read_scans(scan_ids, x_label, y_label, **kwargs):
+def read_scans(db, scan_ids, x_label, y_label, **kwargs):
     real_scan_ids = []
     uids = []
     x_list = []
@@ -35,7 +49,7 @@ def read_scans(scan_ids, x_label, y_label, **kwargs):
     fwhm_values = []
     beamline_id = None
     for scan_id in scan_ids:
-        d = read_single_scan(scan_id=scan_id, x_label=x_label, y_label=y_label, **kwargs)
+        d = read_single_scan(db, scan_id=scan_id, x_label=x_label, y_label=y_label, **kwargs)
         if not beamline_id:
             beamline_id = d['beamline_id']
         real_scan_ids.append(d['scan_id'])
@@ -54,13 +68,13 @@ def read_scans(scan_ids, x_label, y_label, **kwargs):
     }
 
 
-def read_single_scan(scan_id, x_label=None, y_label=None, convert_to_energy=False, material=None, delta_bragg=None,
+def read_single_scan(db, scan_id, x_label=None, y_label=None, convert_to_energy=False, material=None, delta_bragg=None,
                      d_spacing=None):
-    s = scan_info(scan_id=scan_id)
+    s = scan_info(db, scan_id=scan_id)
 
-    scan = db.db[scan_id]
-    fields = db.get_fields(scan)
-    data = scan_data(scan_id)
+    scan = db[scan_id]
+    fields = scan.fields()
+    data = scan_data(db, scan_id)
     if x_label is not None:
         if check_columns(data=data, columns=[x_label]):
             delta_bragg = 0.0 if not delta_bragg else float(delta_bragg)
@@ -96,11 +110,11 @@ def read_single_scan(scan_id, x_label=None, y_label=None, convert_to_energy=Fals
     }
 
 
-def scan_data(scan_id):
-    scan = db.db[scan_id]
-    return db.get_table(scan)
+def scan_data(db, scan_id):
+    scan = db[scan_id]
+    return scan.table()
 
 
-def scan_info(scan_id):
-    scan = db.db[scan_id]
+def scan_info(db, scan_id):
+    scan = db[scan_id]
     return scan.start

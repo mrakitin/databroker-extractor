@@ -4,12 +4,16 @@
 import extractor.common.command_line as cl
 import extractor.common.io as c_io
 import extractor.common.plot as c_plot
+from extractor.common.databroker import activate_beamline_db
 
 
 def extractor_cli():
     args, save_files = cl.parse_command_line()
 
     config_dict = cl.read_config(beamline=args.beamline)
+
+    db = activate_beamline_db(args.beamline)
+
     x_label = args.x_label if args.x_label else cl.get_beamline_labels(config_dict=config_dict, label='x_label')
     y_label = args.y_label if args.y_label else cl.get_beamline_labels(config_dict=config_dict, label='y_label')
     x_units = args.x_units if args.x_units else cl.get_beamline_units(config_dict=config_dict, units='x_units')
@@ -39,7 +43,7 @@ def extractor_cli():
     }
 
     if args.plot_ids is not None:
-        c_plot.plot_scans(scan_ids=cl.parse_scan_ids(args.plot_ids), **plot_kwargs)
+        c_plot.plot_scans(db, scan_ids=cl.parse_scan_ids(args.plot_ids), **plot_kwargs)
 
     if save_files:
         if args.save_ids is not None:
@@ -49,7 +53,7 @@ def extractor_cli():
 
         print('The following scan ids will be saved: {} ({} scans)'.format(scan_ids, len(scan_ids)))
         for scan_id in scan_ids:
-            c_plot.plot_scans(scan_ids=[scan_id], show=False, **plot_kwargs)
+            c_plot.plot_scans(db, scan_ids=[scan_id], show=False, **plot_kwargs)
             file_name = c_io.save_data(scan_id=scan_id, **save_kwargs)
             print('    Saved {}'.format(file_name))
 

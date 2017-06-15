@@ -19,7 +19,7 @@ def format_filename(beamline_id, scan_id, extension='', timestamp=None):
     return format_name.format(*args, extension)
 
 
-def save_data(scan_id, columns=None, index=False, extension='dat', **kwargs):
+def save_data(db, scan_id, columns=None, index=False, extension='dat', **kwargs):
     """Save data to a file.
 
     :param scan_id: scan id to save data for.
@@ -28,7 +28,7 @@ def save_data(scan_id, columns=None, index=False, extension='dat', **kwargs):
     :param extension: extension of the file.
     :return file_name: name of the saved file.
     """
-    s = c_db.scan_info(scan_id=scan_id)
+    s = c_db.scan_info(db, scan_id=scan_id)
     file_name = format_filename(
         beamline_id=s.beamline_id,
         scan_id=s.scan_id,
