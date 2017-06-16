@@ -96,7 +96,6 @@ ENV/
 .ropeproject
 
 .idea/
-*.png
 *.tif
 *.tiff
 *.dat
