@@ -43,11 +43,24 @@ ssh -fN -o ExitOnForwardFailure=yes chx-srv1 2>/dev/null && sshfs mrakitin@chx-s
 - Use earlier defined conda environment or use one from the databroker tutorial - https://github.com/NSLS-II/broker-tutorial.
 
 - Run the script to collect data:
+
+SMI:
 ```bash
 $ databroker-extractor -b smi -s 400 420 440 460 480 -e  # saves data and plots for the provided scans
 ```
 ```bash
 $ databroker-extractor -b smi -p 400 420 440 460 480 -e  # plots data for the provided scans
 ```
-
 ![scans](img/smi_scan_400-480.png)
+
+CHX:
+```bash
+$ databroker-extractor -b chx -p 19008 19010 19021 19023 -e
+```
+![scans](img/chx_scan_19008-19023.png)
+
+SRX:
+```bash
+$ databroker-extractor -b srx -p 029c0d3a 705980d9 82337021 a0d35aba 54032db3 7355ac61 96957282 83d5c99d c727d916 -e
+```
+![scans](img/xf05id_scan_328-336.png)
