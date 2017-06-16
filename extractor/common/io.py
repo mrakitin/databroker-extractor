@@ -38,7 +38,7 @@ def save_data(db, scan_id, columns=None, index=False, extension='dat', **kwargs)
 
     save_data_pandas(
         file_name=file_name,
-        data=c_db.scan_data(scan_id=scan_id),
+        data=c_db.scan_data(db, scan_id=scan_id),
         columns=columns,
         index=index,
     )

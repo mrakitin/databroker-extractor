@@ -54,7 +54,7 @@ def extractor_cli():
         print('The following scan ids will be saved: {} ({} scans)'.format(scan_ids, len(scan_ids)))
         for scan_id in scan_ids:
             c_plot.plot_scans(db, scan_ids=[scan_id], show=False, **plot_kwargs)
-            file_name = c_io.save_data(scan_id=scan_id, **save_kwargs)
+            file_name = c_io.save_data(db, scan_id=scan_id, **save_kwargs)
             print('    Saved {}'.format(file_name))
 
 
