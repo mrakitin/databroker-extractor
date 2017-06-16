@@ -13,48 +13,41 @@ pip install -r https://raw.githubusercontent.com/mrakitin/databroker-extractor/m
 pip install git+https://github.com/mrakitin/databroker-extractor
 ```
 
-### Remote access of the data on the CHX beamline of NSLS-II using databroker.
+### Remote access of the data from NSLS-II beamlines using databroker.
 
 Access DataBroker data from outside the gateway:
-- Prepare SSH config file:
+- Prepare the SSH config file, e.g.:
 ```bash
 $ cat ~/.ssh/config
 Host chx-srv1
     User mrakitin
     Hostname xf11id-srv1
-    LocalForward 27018 localhost:27017
+    LocalForward 27011 localhost:27017
     ProxyCommand ssh mrakitin@box64-3.nsls2.bnl.gov nc %h %p 2> /dev/null
 ```
 
 - Create `/XF11ID/data/` dir on a local machine and make a current user/group to own the dir.
 
-- Configure datastore/filestore:
-```bash
-$ cat ~/.config/metadatastore/connection.yml
-database: datastore
-port: 27018
-host: localhost
-timezone: US/Eastern
-```
+- Datastore/filestore are configured automatically, e.g. for 5-ID (SRX) the forwarded port is 27005, for 11-ID (CHX) - 27011, for 12-ID (SMI) - 27012.
 
-```bash
-$ cat ~/.config/filestore/connection.yml
-host: localhost
-port: 27018
-database: filestore
-```
-
-- Make a tunnel to go through a firewall:
+- Make a tunnel to go through a firewall on Linux:
 ```bash
 ssh -fN -o ExitOnForwardFailure=yes chx-srv1 2>/dev/null && sshfs mrakitin@chx-srv1:/XF11ID/data /XF11ID/data/
 ```
 
-- Use conda environment for the databroker tutorial - https://github.com/NSLS-II/broker-tutorial.
+- Make a tunnel to go through a firewall on Windows (with installed PuTTY+Plink) - execute the following batch files:
+  - [CHX_xf11id-srv1.bat](https://github.com/mrakitin/databroker-extractor/blob/master/utils/CHX_xf11id-srv1.bat)
+  - [SMI_xf12id-ca1.bat](https://github.com/mrakitin/databroker-extractor/blob/master/utils/SMI_xf12id-ca1.bat)
+  - [SRX_xf05id-ca1.bat](https://github.com/mrakitin/databroker-extractor/blob/master/utils/SRX_xf05id-ca1.bat)
+
+- Use earlier defined conda environment or use one from the databroker tutorial - https://github.com/NSLS-II/broker-tutorial.
 
 - Run the script to collect data:
 ```bash
-$ databroker-extractor -b chx -s 19002 19003  # saves data and plots for the scans 19002 and 19003
+$ databroker-extractor -b smi -s 400 420 440 460 480 -e  # saves data and plots for the provided scans
 ```
 ```bash
-$ databroker-extractor -b chx -p 19002 19003  # plots data for the scans 19002 and 19003
+$ databroker-extractor -b smi -p 400 420 440 460 480 -e  # plots data for the provided scans
 ```
+
+![scans](img/smi_scan_400-480.png)
