@@ -1,6 +1,6 @@
 # databroker-extractor - tools and utilities for experiments
 
-Used to obtain data from beamline databroker servers and perform initial analysis
+The tools are used to obtain data from beamline databroker servers and perform initial data analysis
 (e.g., calculation of the FWHM of the undulator harmonics).
 
 ### Installation instructions:
@@ -13,7 +13,7 @@ pip install -r https://raw.githubusercontent.com/mrakitin/databroker-extractor/m
 pip install git+https://github.com/mrakitin/databroker-extractor
 ```
 
-### Remote access of the data from NSLS-II beamlines using databroker.
+### Remote access to data from NSLS-II beamlines using databroker.
 
 Access DataBroker data from outside the gateway:
 - Prepare the SSH config file, e.g.:
