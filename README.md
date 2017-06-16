@@ -28,7 +28,7 @@ Host chx-srv1
 
 - Create `/XF11ID/data/` dir on a local machine and make a current user/group to own the dir.
 
-- Datastore/filestore are configured automatically, e.g. for 5-ID (SRX) the forwarded port is 27005, for 11-ID (CHX) - 27011, for 12-ID (SMI) - 27012.
+- Datastore/filestore are configured automatically, e.g. for 5-ID (SRX) the forwarded port is 2700**5**, for 11-ID (CHX) - 270**11**, for 12-ID (SMI) - 270**12**.
 
 - Make a tunnel to go through a firewall on Linux:
 ```bash
