@@ -11,7 +11,7 @@ package_data = {'extractor': ['config/beamlines.json']}
 
 setup(
     name='databroker-extractor',
-    version='20170615.000000',
+    version='20170618.000000',
     description='databroker-extractor - tools and utilities for experiments',
     author='Maksim Rakitin',
     url='https://github.com/mrakitin/databroker-extractor',
