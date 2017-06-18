@@ -7,7 +7,7 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 # From https://docs.python.org/2/distutils/setupscript.html#installing-package-data:
-package_data = {'databroker-extractor': ['config/beamlines.json']}
+package_data = {'extractor': ['config/beamlines.json']}
 
 setup(
     name='databroker-extractor',
