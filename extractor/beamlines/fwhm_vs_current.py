@@ -3,6 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from extractor.common.command_line import read_config
+from extractor.common.databroker import activate_beamline_db
 from extractor.common.databroker import read_single_scan
 from extractor.common.fit_data import fit_data, plot_data
 from extractor.common.io import save_data_pandas
@@ -23,9 +24,11 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     if mode:
         columns.append('espread')
     fname = '{}_fwhm_vs_current_{}_to_{}'.format(beamline.lower(), scans[0], scans[-1])
+    db = activate_beamline_db(beamline)
     for i, s in enumerate(scans):
         print('s={}'.format(s))
         d = read_single_scan(
+            db,
             s,
             x_label=x_label,
             y_label=y_label,
@@ -172,13 +175,13 @@ def main(beamline, **kwargs):
         delta_bragg = 0.315532509387
         d_spacing = 3.12924894907
 
-        mode = 'bare'
-        scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
-                      'c727d916']  # bare lattice
+        # mode = 'bare'
+        # scans_list = ['029c0d3a', '705980d9', '82337021', 'a0d35aba', '54032db3', '7355ac61', '96957282', '83d5c99d',
+        #               'c727d916']  # bare lattice
 
-        # mode = '1DW'
-        # scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
-        #               '295f3c57', 'ab5af66b']  # 1DW
+        mode = '1DW'
+        scans_list = ['5519635e', '86e8f4a2', '74cce791', '4a5ba6ca', '6dcfe33a', '4bcb4b69', 'e76cdf48', '0d98ec03',
+                      '295f3c57', 'ab5af66b']  # 1DW
         ring_currents = None
 
     if not scans_list:
@@ -275,15 +278,15 @@ if __name__ == '__main__':
     # Bare lattice:
 
     # 8 pm:
-    lattice = 'bare lattice'
-    # lattice = '1DW'
+    # lattice = 'bare lattice'
+    lattice = '1DW'
     data = np.array([
-        [39.28357, 0.5],
-        [45.43406, 0.7],
-        [52.22852, 0.9],
-        [59.27309, 1.1],
-        [66.35909, 1.3],
-        [73.47602, 1.5],
+        [38.85169, 0.5],
+        [44.98709, 0.7],
+        [51.80023, 0.9],
+        [58.83807, 1.1],
+        [65.90450, 1.3],
+        [72.99444, 1.5],
     ])
 
     # 30 pm:
@@ -349,7 +352,14 @@ if __name__ == '__main__':
     x_label = 'FWHM ({}) [eV]'.format(lattice)
     y_label = r'Energy spread, 10$^{-3}$'
     title = 'Energy spread vs. FWHM ({})'.format(lattice)
-    file_name = '{}.png'.format(title.replace(' ', '_'))
+    basename = title.replace(' ', '_')
+    file_name = '{}.png'.format(basename)
+
+    # df = pd.DataFrame(dense_x_y_data, columns=['FWHM', 'Espread'])
+    conversion_cols = ['FWHM', 'Espread']
+    df = pd.DataFrame(np.array((xx2, yy2)).T, columns=conversion_cols)
+    with open('{}.dat'.format(basename), 'w') as f:
+        f.write(df.to_string(columns=conversion_cols))
 
     plot_data(x, y, xx2, yy2, fitting_coefs, x_label, y_label, title=title, file_name=file_name)
 
