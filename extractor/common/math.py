@@ -6,14 +6,15 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def calc_fwhm(x, y, shift=0.5):  # MR21032017
+def calc_fwhm(x, y, shift=0.5, return_as_dict=True):  # MR21062017
     """The function searches x-values (roots) where y=0 (after normalization to values between 0 and 1 and shifting the
     values down by 0.5 (default value)) based on linear interpolation, and calculates full width at half maximum (FWHM).
 
     :param x: an array of x values.
     :param y: an array of y values.
     :param shift: an optional shift to be used in the process of normalization (between 0 and 1).
-    :return: a dictionary consisting of 'fwhm' and 'x_range'
+    :param return_as_dict: if to return a dict with 'fwhm' and 'x_range'
+    :return: a value of the FWHM or dictionary consisting of 'fwhm' and 'x_range'
     """
 
     def is_positive(num):
@@ -30,10 +31,13 @@ def calc_fwhm(x, y, shift=0.5):  # MR21032017
             list_of_roots.append(x[i - 1] + (x[i] - x[i - 1]) / (abs(y[i]) + abs(y[i - 1])) * abs(y[i - 1]))
             positive = not positive
     if len(list_of_roots) >= 2:
-        return {
-            'fwhm': abs(list_of_roots[-1] - list_of_roots[0]),
-            'x_range': list_of_roots,
-        }
+        if not return_as_dict:
+            return abs(list_of_roots[-1] - list_of_roots[0])
+        else:
+            return {
+                'fwhm': abs(list_of_roots[-1] - list_of_roots[0]),
+                'x_range': list_of_roots,
+            }
     else:
         raise Exception('Number of roots is less than 2!')
 
