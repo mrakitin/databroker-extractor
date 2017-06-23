@@ -3,7 +3,7 @@
 
 """Convenience wrapper for running beamlinex directly from source tree."""
 
-from extractor.extractor import extractor_cli
+from databroker_extractor.extractor import extractor_cli
 
 if __name__ == '__main__':
     extractor_cli()

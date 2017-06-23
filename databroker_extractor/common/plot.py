@@ -5,9 +5,9 @@ import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
 
-import extractor.common.databroker as c_db
-import extractor.common.date_time as c_dt
-import extractor.common.io as c_io
+import databroker_extractor.common.databroker as c_db
+import databroker_extractor.common.date_time as c_dt
+import databroker_extractor.common.io as c_io
 
 
 def plot_scans(db, scan_ids, x_label, y_label, x_units=None, y_units=None, norm=None, save=True, show=True,

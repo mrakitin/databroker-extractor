@@ -3,8 +3,8 @@
 
 import numpy as np
 
-import extractor.common.databroker as c_db
-import extractor.common.date_time as c_dt
+import databroker_extractor.common.databroker as c_db
+import databroker_extractor.common.date_time as c_dt
 
 
 def format_filename(beamline_id, scan_id, extension='', timestamp=None):

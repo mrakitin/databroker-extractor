@@ -7,8 +7,8 @@ from databroker import Broker
 from filestore.fs import FileStoreRO as FSRO  # file store read-only
 from metadatastore.mds import MDSRO  # metadata store read-only
 
-import extractor.common.math as c_math
-from extractor.common.command_line import read_config
+import databroker_extractor.common.math as c_math
+from databroker_extractor.common.command_line import read_config
 
 
 def activate_beamline_db(beamline=None):

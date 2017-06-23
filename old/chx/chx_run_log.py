@@ -2,7 +2,7 @@ import databroker as db
 import numpy as np
 from matplotlib import pyplot as plt
 
-from extractor import common as c_db, common as c_dt, common as c_io, common as c_plot
+from databroker_extractor import common as c_db, common as c_dt, common as c_io, common as c_plot
 
 if __name__ == '__main__':
     detector = 'xray_eye3_image'

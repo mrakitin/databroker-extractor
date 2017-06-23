@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import leastsq
 
-import extractor.common.command_line as cl
-import extractor.common.plot as c_plot
+import databroker_extractor.common.command_line as cl
+import databroker_extractor.common.plot as c_plot
 
 
 def input_data(beamline, study='elevation', no_save=True):

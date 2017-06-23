@@ -4,7 +4,7 @@
 import datetime
 import time
 
-import extractor.common.databroker as c_db
+import databroker_extractor.common.databroker as c_db
 
 
 def current_timestamp():

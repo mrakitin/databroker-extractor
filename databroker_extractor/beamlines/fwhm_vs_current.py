@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from extractor.common.command_line import read_config
-from extractor.common.databroker import activate_beamline_db
-from extractor.common.databroker import read_single_scan
-from extractor.common.fit_data import fit_data, plot_data
-from extractor.common.io import save_data_pandas
-from extractor.common.plot import clear_plt
+from databroker_extractor.common.command_line import read_config
+from databroker_extractor.common.databroker import activate_beamline_db
+from databroker_extractor.common.databroker import read_single_scan
+from databroker_extractor.common.fit_data import fit_data, plot_data
+from databroker_extractor.common.io import save_data_pandas
+from databroker_extractor.common.plot import clear_plt
 
 
 def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_energy=False, material=None,

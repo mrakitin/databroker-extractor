@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import extractor.common.command_line as cl
-import extractor.common.io as c_io
-import extractor.common.plot as c_plot
-from extractor.common.databroker import activate_beamline_db
+import databroker_extractor.common.command_line as cl
+import databroker_extractor.common.io as c_io
+import databroker_extractor.common.plot as c_plot
+from databroker_extractor.common.databroker import activate_beamline_db
 
 
 def extractor_cli():
