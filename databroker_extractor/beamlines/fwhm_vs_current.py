@@ -12,7 +12,7 @@ from databroker_extractor.common.plot import clear_plt
 
 def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_energy=False, material=None,
                     x_label='dcm_bragg', y_label='VFMcamroi1', beamline='SMI', ring_currents=None, harmonic=None,
-                    mode=None, num_bunches=None, delta_bragg=None, d_spacing=None, **kwargs):
+                    mode=None, num_bunches=None, delta_bragg=None, d_spacing=None, fwhm_err_pct=2.5, **kwargs):
     allowed_current_values = ('mean', 'peak', 'first', 'last')
     if current not in allowed_current_values:
         raise ValueError('{}: not allowed. Allowed values: {}'.format(current, allowed_current_values))
@@ -23,6 +23,8 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
     columns = ['timestamp', 'current_per_bunch', 'fwhm']
     if mode:
         columns.append('espread')
+        columns.append('espread_left')
+        columns.append('espread_right')
     fname = '{}_fwhm_vs_current_{}_to_{}'.format(beamline.lower(), scans[0], scans[-1])
     db = activate_beamline_db(beamline)
     for i, s in enumerate(scans):
@@ -39,6 +41,17 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
         )
         fwhm = d['fwhm']
         espread = fwhm2espread(fwhm, mode=mode, **kwargs) if mode else None
+
+        # Errors estimation:
+        fwhm_left = fwhm * (1.0 - 0.01*fwhm_err_pct)
+        fwhm_right = fwhm * (1.0 + 0.01*fwhm_err_pct)
+        espread_left = fwhm2espread(fwhm_left, mode=mode, **kwargs) if mode else None
+        espread_right = fwhm2espread(fwhm_right, mode=mode, **kwargs) if mode else None
+        espread_err_left = espread_left-espread
+        espread_err_right = espread_right-espread
+
+        print('Esp left: {}  >  Esp {}  <  Esp right: {}  Diff left: {}  Diff right: {}'.format(espread_left, espread, espread_right, espread_left-espread, espread_right-espread))
+        print('% left: {}   % right: {}'.format((espread_left-espread)/espread*100, (espread_right-espread)/espread*100))
 
         if not ring_currents:
             if current == 'mean':
@@ -58,6 +71,8 @@ def fwhm_vs_current(scans, reverse=False, current='mean', show=True, convert_to_
         data.append([np.array(d['data']['time'])[i], ring_current / float(num_bunches), fwhm])
         if espread:
             data[-1].append(espread)
+            data[-1].append(abs(espread_err_left))
+            data[-1].append(abs(espread_err_right))
 
     # Convert data to pandas dataframe:
     data = pd.DataFrame(data, columns=columns)
@@ -125,11 +140,11 @@ def main(beamline, **kwargs):
 
         # SMI measurements on 03/18/2017:
         harmonic = '7th harmonic'
-        # mode = 'reg'
-        # scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
-        #               381]
-        # ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
-        #                  48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
+        mode = 'reg'
+        scans_list = [338, 343, 344, 345, 353, 354, 355, 361, 362, 364, 367, 368, 369, 375, 376, 377, 378, 379, 380,
+                      381]
+        ring_currents = [4.8, 9, 8.766, 17.28, 19.963, 18.64, 26.281, 29.215, 28.442, 36.439, 40.425, 39.378, 38.367,
+                         48.681, 47.281, 46.019, 44.719, 43.538, 42.417, 41.303]
 
         # harmonic = '17th harmonic'
         # scans_list = [339, 342, 346, 349, 350, 352, 356, 360, 366, 370, 372, 373]
@@ -141,13 +156,13 @@ def main(beamline, **kwargs):
 
 
         # # SMI measurements on 04/04/2017:
-        x_label = 'dcm_bragg'
-        mode = 'bare'
-        first = 418
-        last = 657
-        exclude = [529] + list(range(565, 584))
-        scans_list = None
-        ring_currents = None
+        # x_label = 'dcm_bragg'
+        # mode = 'bare'
+        # first = 418
+        # last = 657
+        # exclude = [529] + list(range(565, 584))
+        # scans_list = None
+        # ring_currents = None
 
     elif beamline.upper() == 'CHX':
         x_label = 'dcm_b'
@@ -236,8 +251,8 @@ if __name__ == '__main__':
     num_bunches = 15
 
     # beamline = 'SMI'
-    # beamline = 'CHX'
-    beamline = 'SRX'
+    beamline = 'CHX'
+    # beamline = 'SRX'
 
     # ***** SMI beamline *****
     # Reg. lattice:
@@ -279,15 +294,15 @@ if __name__ == '__main__':
 
     # 8 pm:
     # lattice = 'bare lattice'
-    lattice = '1DW'
-    data = np.array([
-        [38.85169, 0.5],
-        [44.98709, 0.7],
-        [51.80023, 0.9],
-        [58.83807, 1.1],
-        [65.90450, 1.3],
-        [72.99444, 1.5],
-    ])
+    # lattice = '1DW'
+    # data = np.array([
+    #     [25.45005, 0.5],
+    #     [32.99879, 0.7],
+    #     [40.66154, 0.9],
+    #     [48.32708, 1.1],
+    #     [56.01338, 1.3],
+    #     [63.73374, 1.5],
+    # ])
 
     # 30 pm:
     # lattice = 'bare lattice'
@@ -327,15 +342,15 @@ if __name__ == '__main__':
     # ])
 
     # # 30 pm:
-    # lattice = 'reg. lattice'
-    # data = np.array([
-    #     [32.64499, 0.5],
-    #     [41.18504, 0.7],
-    #     [49.70517, 0.9],
-    #     [58.26634, 1.1],
-    #     [66.89718, 1.3],
-    #     [75.41395, 1.5],
-    # ])
+    lattice = 'reg. lattice'
+    data = np.array([
+        [32.64499, 0.5],
+        [41.18504, 0.7],
+        [49.70517, 0.9],
+        [58.26634, 1.1],
+        [66.89718, 1.3],
+        [75.41395, 1.5],
+    ])
 
     # 50 pm:
     # lattice = 'reg. lattice'
