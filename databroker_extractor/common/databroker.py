@@ -75,14 +75,14 @@ def read_single_scan(db, scan_id, x_label=None, y_label=None, convert_to_energy=
     scan = db[scan_id]
     fields = scan.fields()
     data = scan_data(db, scan_id)
+    x = None
+    y = None
     if x_label is not None:
         if check_columns(data=data, columns=[x_label]):
             delta_bragg = 0.0 if not delta_bragg else float(delta_bragg)
             if d_spacing:
                 d_spacing = float(d_spacing)
             x = np.array(data[x_label]) + delta_bragg
-    else:
-        x = None
     if convert_to_energy:
         x = xf.get_EBragg(material, theta_Bragg=np.abs(x), d_spacing=d_spacing) * 1e3  # keV -> eV
     if y_label is not None:
