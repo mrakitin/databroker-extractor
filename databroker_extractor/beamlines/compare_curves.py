@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import scipy.spatial.distance as spd
 
+from databroker_extractor.common.io import save_data_pandas
 from databroker_extractor.common.plot import clear_plt
 
 
@@ -24,18 +25,31 @@ def calc_dist(x_calc, y_calc, x_exp, y_exp):
 
     # Calculate shift of the data and shift the calculated data:
     shift = x_exp[y_exp.argmax()] - x_calc[y_calc.argmax()]  # eV
-    x_calc += shift
 
-    # Map the calculated data to the experimental mesh:
-    y_calc_exp_mesh = np.interp(x_exp, x_calc, y_calc)
+    cosines = []
+    meshes = []
+    shifts = []
+    for pct in np.linspace(-10, 10, 10001):
+        new_shift = shift * (1. + pct / 100.)
+        new_x_calc = x_calc + new_shift
 
-    # Measure similarity:
-    cosine = spd.cosine(y_calc_exp_mesh, y_exp)
+        # Map the calculated data to the experimental mesh:
+        y_calc_exp_mesh = np.interp(x_exp, new_x_calc, y_calc)
 
-    return cosine, y_calc_exp_mesh
+        # Measure similarity:
+        cosine = spd.cosine(y_calc_exp_mesh, y_exp)
+
+        cosines.append(cosine)
+        meshes.append(y_calc_exp_mesh)
+        shifts.append(new_shift)
+
+    # Find min cosine and the corresponding mesh:
+    idx = np.argmin(cosines)
+
+    return cosines[idx], meshes[idx], shifts[idx]
 
 
-def plot_data(exp_file, calc_file, x_exp, y_exp, y_calc_exp_mesh, cosine, precision=6,
+def plot_data(exp_file, calc_file, x_exp, y_exp, y_calc_exp_mesh, cosine, precision=6, shift=None,
               x_label='Photon Energy [eV]', y_label='Intensity, arb. units', show=False):
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111)
@@ -47,9 +61,9 @@ def plot_data(exp_file, calc_file, x_exp, y_exp, y_calc_exp_mesh, cosine, precis
 
     ax.plot(x_exp, y_calc_exp_mesh,
             label='Calculated data: {} (norm. and interp. to exp.data)'.format(base_calc_file))
-    ax.plot(x_exp, y_exp, label='Experimental data: {}'.format(base_exp_file))
+    ax.scatter(x_exp, y_exp, s=10, c='red', label='Experimental data: {}'.format(base_exp_file))
 
-    ax.set_title('Cosine distance: {0:.{1}f}'.format(cosine, precision))
+    ax.set_title('Cosine distance: {0:.{1}f}  offset: {2:.3f} eV'.format(cosine, precision, shift))
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
 
@@ -145,12 +159,21 @@ if __name__ == '__main__':
         x_calc, y_calc = read_calc(calc_file=calc_file)
 
         # Calculate cosine distance:
-        cosine, y_calc_exp_mesh = calc_dist(x_calc=x_calc, y_calc=y_calc,
-                                            x_exp=x_exp, y_exp=y_exp)
+        cosine, y_calc_exp_mesh, shift = calc_dist(x_calc=x_calc, y_calc=y_calc,
+                                                   x_exp=x_exp, y_exp=y_exp)
 
         # Plot:
         save_fig_file = plot_data(exp_file=exp_file, calc_file=calc_file, x_exp=x_exp, y_exp=y_exp,
-                                  y_calc_exp_mesh=y_calc_exp_mesh, cosine=cosine)
+                                  y_calc_exp_mesh=y_calc_exp_mesh, cosine=cosine, shift=shift)
+
+        # Save data:
+        columns = ['energy', 'intensity']
+        data = pd.DataFrame(np.array([x_exp, y_calc_exp_mesh]).T, columns=columns)
+        fname = os.path.splitext(save_fig_file)[0]
+        file_name_dat = '{}.dat'.format(fname)
+        file_name_csv = '{}.csv'.format(fname)
+        save_data_pandas(file_name_dat, data, columns, index=True, justify='right')
+        data.to_csv(file_name_csv)
 
         ens.append(float(os.path.basename(calc_file).split('_')[4]))
         cos.append(cosine)
