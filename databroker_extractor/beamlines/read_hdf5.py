@@ -3,12 +3,29 @@ import os
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import scipy
 from chxanalys.chx_libs import cmap_albula
 from chxanalys.chx_packages import load_mask
 from matplotlib.colors import LogNorm
 
 from databroker_extractor.common.plot import clear_plt
+
+
+def plot_1d(data, hdf5_files, figsize=(12, 9), img_name='img.png', dpi=400, log=False, show=False):
+    # Plot the cuts
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    for k, v in data.items():
+        if log:
+            v = np.log10(v)
+        ax.plot(v, label='{} ({})'.format(hdf5_files[k], os.path.splitext(k)[0]))
+    plt.legend()
+    plt.savefig(img_name, dpi=dpi)
+    if show:
+        plt.show()
+    clear_plt()
+
 
 if __name__ == '__main__':
     data_dir = 'C:\\Users\\mraki\\Documents\\Work\\Beamlines\\CHX\\2017-07-12 CHX eiger data\\'
@@ -26,12 +43,16 @@ if __name__ == '__main__':
 
     slices = {}
     # img_num = 0
-    # img_num = 100
-    img_num = 'mean'
+    # img_num = 10
+    img_num = 100
+    # img_num = 'mean'
 
     rotate = True
+    # rotate = False
+
     # cmap = 'gray'
     cmap = cmap_albula
+
     for hdf5_file, desc in hdf5_files.items():
         hdf5_file_full = os.path.join(data_dir, hdf5_file)
         fig_file = '{}_img_{}.png'.format(os.path.splitext(hdf5_file_full)[0], img_num)
@@ -60,23 +81,27 @@ if __name__ == '__main__':
         slices[hdf5_file] = rotated_data[y_center, :]
 
     # Plot the cut in linear scale:
-    fig = plt.figure(figsize=(12, 9))
-    ax = fig.add_subplot(111)
-    for k, v in slices.items():
-        ax.plot(v, label='{} ({})'.format(hdf5_files[k], os.path.splitext(k)[0]))
-    plt.legend()
-    plt.savefig(os.path.join(data_dir, 'slices_img_{}.png'.format(img_num)), dpi=400)
+    slices_basename = os.path.join(data_dir, 'slices_img_{}'.format(img_num))
+    plot_1d(slices, hdf5_files, img_name='{}.png'.format(slices_basename))
 
     # Plot the cut in log scale:
-    fig = plt.figure(figsize=(12, 9))
-    ax = fig.add_subplot(111)
-    for k, v in slices.items():
-        ax.plot(np.log10(v), label='{} ({})'.format(hdf5_files[k], os.path.splitext(k)[0]))
-    plt.legend()
-    plt.savefig(os.path.join(data_dir, 'slices_img_{}_log.png'.format(img_num)), dpi=400)
+    slices_basename_log = os.path.join(data_dir, 'slices_img_{}_log'.format(img_num))
+    plot_1d(slices, hdf5_files, img_name='{}.png'.format(slices_basename_log), log=True)
 
     # Pandas dataframe with the cuts:
-
-
+    columns = []
+    data = []
+    for k, v in slices.items():
+        colname = 'CHX_{}_{}_{}'.format(
+            hdf5_files[k].replace(' ', ''),
+            k.split('_')[1],
+            img_num,
+        )
+        columns.append(colname)
+        data.append(v)
+    data = pd.DataFrame(np.array(data).T, columns=columns)
+    data.to_csv('{}.csv'.format(slices_basename), index=None)
+    with open('{}.dat'.format(slices_basename), 'w') as f:
+        f.write(data.to_string(columns=columns))
 
     print('')
