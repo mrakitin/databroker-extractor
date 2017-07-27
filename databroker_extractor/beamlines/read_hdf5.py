@@ -37,7 +37,8 @@ if __name__ == '__main__':
         '201706262225_3dbf3e_2851.h5': '0.2 mm',
     }
     # Masks:
-    mask = load_mask(data_dir, 'June26_chubar.npy', reverse=True)
+    # mask = load_mask(data_dir, 'June26_chubar.npy', reverse=True)
+    mask = load_mask(data_dir, 'June26_chubar_diffraction.npy', reverse=True)
     chip_mask = np.load(os.path.join(data_dir, 'Eiger4M_chip_mask.npy'))
 
     y_center = 925
@@ -45,8 +46,8 @@ if __name__ == '__main__':
     slices = {}
     # img_num = 0
     # img_num = 10
-    img_num = 100
-    # img_num = 'mean'
+    # img_num = 100
+    img_num = 'mean'
 
     # rotate = True
     rotate = False
