@@ -9,6 +9,7 @@ from chxanalys.chx_libs import cmap_albula
 from chxanalys.chx_packages import load_mask
 from matplotlib.colors import LogNorm
 
+from databroker_extractor.beamlines.eiger_images import save_hdf5
 from databroker_extractor.common.plot import clear_plt
 
 
@@ -47,33 +48,41 @@ if __name__ == '__main__':
     img_num = 100
     # img_num = 'mean'
 
-    rotate = True
-    # rotate = False
+    # rotate = True
+    rotate = False
+    rotate_angle = -30
 
     # cmap = 'gray'
     cmap = cmap_albula
 
     for hdf5_file, desc in hdf5_files.items():
         hdf5_file_full = os.path.join(data_dir, hdf5_file)
-        fig_file = '{}_img_{}.png'.format(os.path.splitext(hdf5_file_full)[0], img_num)
+        fig_file_basename = '{}_img_{}'.format(os.path.splitext(hdf5_file_full)[0], img_num)
+        fig_file = '{}.png'.format(fig_file_basename)
+        hdf5_save_file = '{}.h5'.format(fig_file_basename)
         f = h5py.File(hdf5_file_full, 'r')
         data = f['dataset']
 
         d = (data[img_num] if img_num is not 'mean' else np.mean(data, axis=0)) * mask * chip_mask
 
         if rotate:
-            rotated_data = scipy.ndimage.interpolation.rotate(d, angle=-30, reshape=False, order=0)
+            rotated_data = scipy.ndimage.interpolation.rotate(d, angle=rotate_angle, reshape=False, order=0)
             where_negative = np.where(rotated_data < 0)
             print('where_negative:', where_negative)
             rotated_data[where_negative] = 0
         else:
             rotated_data = d
 
+        # Save data to HDF5 for further import to Igor Pro:
+        status = save_hdf5(rotated_data, filename=hdf5_save_file)
+        print('Status: {} for file {}'.format(status, hdf5_save_file))
+
         fig, ax = plt.subplots(figsize=(8, 6))
         pos = ax.imshow(rotated_data, norm=LogNorm(), vmin=1e-4, vmax=1e4, cmap=cmap, aspect='equal',
                         interpolation='none')
         fig.colorbar(pos, ax=ax)
-        plt.axhline(y_center, color='red')
+        if rotate:
+            plt.axhline(y_center, color='red')
         plt.title(desc)
         plt.savefig(fig_file, dpi=200)
         clear_plt()
