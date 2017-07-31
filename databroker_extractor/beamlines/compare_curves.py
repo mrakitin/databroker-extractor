@@ -2,12 +2,14 @@ import argparse
 import glob
 import os
 
+import chxtools.xfuncs as xf  # from https://github.com/NSLS-II-CHX/chxtools/blob/master/chxtools/xfuncs.py
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.spatial.distance as spd
 
 from databroker_extractor.common.io import save_data_pandas
+from databroker_extractor.common.math import calc_fwhm
 from databroker_extractor.common.plot import clear_plt
 
 
@@ -79,7 +81,7 @@ def plot_data(exp_file, calc_file, x_exp, y_exp, y_calc_exp_mesh, cosine, precis
     return save_fig_file
 
 
-def read_exp(exp_file, conversion_factor=1):
+def read_exp(exp_file, conversion_factor=1, convert_to_energy=False, material='Si111cryo', d_spacing=None):
     """Read experimental data.
 
     :param exp_file: experimental CSV file from databroker.
@@ -88,9 +90,12 @@ def read_exp(exp_file, conversion_factor=1):
     """
     exp_data = pd.read_csv(exp_file)
     x_exp = exp_data[x_label]
+    if convert_to_energy:
+        x_exp = xf.get_EBragg(material, theta_Bragg=np.abs(x_exp), d_spacing=d_spacing) * 1e3  # keV -> eV
     y_exp = exp_data[y_label]
     x_exp *= conversion_factor
-    return x_exp, y_exp
+    fwhm_exp = _calc_fwhm(x_exp, y_exp)
+    return x_exp, y_exp, fwhm_exp
 
 
 def read_calc(calc_file, header_rows=10):
@@ -110,7 +115,16 @@ def read_calc(calc_file, header_rows=10):
     y_calc = np.loadtxt(calc_file, skiprows=header_rows)
     assert n_points == len(y_calc), \
         'Number of points {} does not match the length of the read data {}'.format(len(y_calc), n_points)
-    return x_calc, y_calc
+    fwhm_exp = _calc_fwhm(x_calc, y_calc)
+    return x_calc, y_calc, fwhm_exp
+
+
+def _calc_fwhm(x, y):
+    try:
+        fwhm = calc_fwhm(x, y)['fwhm']
+    except:
+        fwhm = -1
+    return fwhm
 
 
 def _parse_header(header_row, data_type):
@@ -133,6 +147,10 @@ if __name__ == '__main__':
                         help='experimental data file (*.csv from databroker)')
     parser.add_argument('-x', '--x-label', dest='x_label', default='energy_energy', help='x label to plot')
     parser.add_argument('-y', '--y-label', dest='y_label', default='bpmAD_stats3_total', help='y label to plot')
+    parser.add_argument('-t', '--convert-to-energy', dest='convert_to_energy', action='store_true',
+                        help='convert to energy from Bragg diffraction angle')
+    parser.add_argument('--d-spacing', dest='d_spacing', default=None,
+                        help='an arbitrary d-spacing of the crystal of the DCM [A]')
     args = parser.parse_args()
 
     if (not args.exp_file) or (not args.calc_file and not args.calc_dir):
@@ -150,32 +168,54 @@ if __name__ == '__main__':
     exp_file = args.exp_file
     x_label = args.x_label
     y_label = args.y_label
+    convert_to_energy = args.convert_to_energy
+    d_spacing = args.d_spacing
+    if d_spacing:
+        d_spacing = float(d_spacing)
 
     # Read data from the both sources:
-    x_exp, y_exp = read_exp(exp_file=exp_file, conversion_factor=1000)  # convert keV -> eV
+    if not convert_to_energy:
+        kwargs = {
+            'exp_file': exp_file,
+            'conversion_factor': 1000,
+        }
+    else:
+        kwargs = {
+            'exp_file': exp_file,
+            'conversion_factor': 1,
+            'convert_to_energy': True,
+            'd_spacing': d_spacing,  # convert Bragg angle -> eV
+        }
+    x_exp, y_exp, fwhm_exp = read_exp(**kwargs)  # convert keV -> eV
+
     ens = []
     cos = []
     for calc_file in calc_files:
-        x_calc, y_calc = read_calc(calc_file=calc_file)
+        x_calc, y_calc, fwhm_calc = read_calc(calc_file=calc_file)
 
         # Calculate cosine distance:
         cosine, y_calc_exp_mesh, shift = calc_dist(x_calc=x_calc, y_calc=y_calc,
                                                    x_exp=x_exp, y_exp=y_exp)
+        print('FWHM exp: {:.5f} eV    FWHM calc: {:.5f} eV'.format(fwhm_exp, fwhm_calc))
 
         # Plot:
         save_fig_file = plot_data(exp_file=exp_file, calc_file=calc_file, x_exp=x_exp, y_exp=y_exp,
                                   y_calc_exp_mesh=y_calc_exp_mesh, cosine=cosine, shift=shift)
 
         # Save data:
-        columns = ['energy', 'intensity']
-        data = pd.DataFrame(np.array([x_exp, y_calc_exp_mesh]).T, columns=columns)
+        columns = ['energy', 'intensity_calc', 'intensity_exp']
+        data = pd.DataFrame(np.array([x_exp, y_calc_exp_mesh, y_exp]).T, columns=columns)
         fname = os.path.splitext(save_fig_file)[0]
         file_name_dat = '{}.dat'.format(fname)
         file_name_csv = '{}.csv'.format(fname)
         save_data_pandas(file_name_dat, data, columns, index=True, justify='right')
         data.to_csv(file_name_csv)
 
-        ens.append(float(os.path.basename(calc_file).split('_')[4]))
+        try:
+            ens_value = float(os.path.basename(calc_file).split('_')[4])
+        except:
+            ens_value = -1.
+        ens.append(ens_value)
         cos.append(cosine)
 
         print('File: {}    Cosine distance: {:.6f}'.format(save_fig_file, cosine))
