@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # diff = (float(x_a[np.where(y_a == y_a.max())[0]]) - float(x_b[np.where(y_b == y_b.max())[0]])) * 1.2
 
     # 17th harmonic:
-    diff = (float(x_a[np.where(y_a == y_a.max())[0]]) - float(x_b[np.where(y_b == y_b.max())[0]])) * 1.0
+    diff = (float(x_a[np.where(y_a == y_a.max())[0]]) - float(x_b[np.where(y_b == y_b.max())[0]])) * 1.05
 
     plt.plot(x_b, normalize(y_b), label='scan {}'.format(b['scan']['start']['scan_id']))
     plt.plot(x_a - diff, normalize(y_a), label='scan {}'.format(a['scan']['start']['scan_id']))
